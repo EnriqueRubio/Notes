@@ -6,4 +6,5 @@ class User
     field :password, type: String
     field :admin, type: Boolean
 
+    validates_presence_of :username, :email, :password, :admin
 end
