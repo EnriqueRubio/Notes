@@ -24,20 +24,17 @@ RSpec.describe Note, type: :model do
 
   # Probar que el modelo recupera una nota de la base de datos
   it 'retrieves a note' do
-    note.save
     expect(Note.find(note.id)).to eq(note)
   end
 
   # Probar que el modelo actualiza una nota en la base de datos
   it 'updates a note' do
-    note.save
     note.update(title: 'New title')
     expect(Note.find(note.id).title).to eq('New title')
   end
 
   # Probar que el modelo destruye una nota en la base de datos
   it 'destroys a note' do
-    note.save
     expect { note.destroy }.to change(Note, :count).by(-1)
   end
 end
