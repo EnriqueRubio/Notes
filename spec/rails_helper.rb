@@ -6,6 +6,7 @@ require_relative '../config/environment'
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
 require 'mongoid-rspec'
+require 'factory_bot_rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -26,6 +27,9 @@ require 'mongoid-rspec'
 RSpec.configure do |config|
   # Remove this line to enable support for ActiveRecord
   config.use_active_record = false
+
+  # Incluir los métodos de FactoryBot en las pruebas
+  config.include FactoryBot::Syntax::Methods
 
   config.include Mongoid::Matchers, type: :model
 
