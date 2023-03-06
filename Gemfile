@@ -6,6 +6,12 @@ ruby "3.1.3"
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.0.4", ">= 7.0.4.2"
 
+# Webpacker
+gem "webpacker"
+
+# React
+gem "react_on_rails"
+
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 
@@ -41,6 +47,7 @@ gem "bootsnap", require: false
 
 #mongoid connection
 gem "mongoid"
+gem "mongoid-rspec"
 
 # Use Sass to process CSS
 # gem "sassc-rails"
@@ -66,4 +73,10 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "webdrivers"
+  gem "factory_bot_rails"
+end
+
+group :development, :test do
+  gem "rspec-rails"
+  gem "factory_bot_rails"
 end
