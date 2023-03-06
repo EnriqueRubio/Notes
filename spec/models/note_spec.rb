@@ -15,4 +15,10 @@ RSpec.describe Note, type: :model do
         expect(note.author).to eq(user)
     end
 
+    it "removes a record from the database" do
+        expect(note).to be_persisted
+        note.destroy
+        expect(note).to be_destroyed
+    end
+
 end
