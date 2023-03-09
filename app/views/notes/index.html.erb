@@ -1,0 +1,20 @@
+<ul>
+  <% @notes.each do |note| %>
+    <li><%= note.title %></li>
+  <% end %>
+</ul>
+
+
+
+<div id="note-list"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/16.8.6/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.8.6/umd/react-dom.production.min.js"></script>
+<script src="/assets/note_list.js"></script>
+
+<script>
+  ReactDOM.render(
+    React.createElement(NotesList, { notes: <%= @notes.to_json %> }),
+    document.getElementById('note-list')
+  );
+</script>
