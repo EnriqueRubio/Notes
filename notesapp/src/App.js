@@ -4,8 +4,9 @@ import axios from "axios";
 import Note from "./components/Note/Note"
 import NoteContainer from "./components/NotesContainer/NotesContainer";
 import { useEffect, useState } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min';
+
+
+
 
 const App = () => {
   return (
