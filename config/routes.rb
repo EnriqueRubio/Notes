@@ -9,7 +9,9 @@ Rails.application.routes.draw do
   #get "notes" => "notes#index"
 
   resources :notes, only: [:index, :show, :create, :update, :destroy]
+  #resources :users, only: [:index, :show, :create, :update, :destroy]
 
-  resources :users, only: [:index, :show, :create, :update, :destroy]
-
+  get 'login', to: 'sessions#new'
+  post 'login', to: 'sessions#create'
+  delete 'logout', to: 'sessions#destroy'
 end

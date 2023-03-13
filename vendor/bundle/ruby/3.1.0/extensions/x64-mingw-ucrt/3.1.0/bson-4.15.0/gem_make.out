@@ -1,0 +1,36 @@
+current directory: C:/Users/Clara/Documents/GitHub/Notes/vendor/bundle/ruby/3.1.0/gems/bson-4.15.0/ext/bson
+C:/Ruby31-x64/bin/ruby.exe -I C:/Ruby31-x64/lib/ruby/3.1.0 extconf.rb
+creating Makefile
+
+current directory: C:/Users/Clara/Documents/GitHub/Notes/vendor/bundle/ruby/3.1.0/gems/bson-4.15.0/ext/bson
+make DESTDIR\= sitearchdir\=./.gem.20230313-16072-bgeljh sitelibdir\=./.gem.20230313-16072-bgeljh clean
+
+current directory: C:/Users/Clara/Documents/GitHub/Notes/vendor/bundle/ruby/3.1.0/gems/bson-4.15.0/ext/bson
+make DESTDIR\= sitearchdir\=./.gem.20230313-16072-bgeljh sitelibdir\=./.gem.20230313-16072-bgeljh
+generating bson_native-x64-mingw-ucrt.def
+compiling bytebuf.c
+compiling endian.c
+compiling init.c
+compiling libbson-utf8.c
+compiling read.c
+read.c: In function 'rb_bson_byte_buffer_get_hash':
+read.c:405:90: warning: format '%ld' expects argument of type 'long int', but argument 3 has type 'long long int' [-Wformat=]
+  405 |     pvt_raise_decode_error(rb_sprintf("Expected to read %d bytes for the hash but read %ld bytes", length, READ_PTR(b) - start_ptr));
+      |                                                                                        ~~^
+      |                                                                                          |
+      |                                                                                          long int
+      |                                                                                        %lld
+read.c: In function 'rb_bson_byte_buffer_get_array':
+read.c:436:90: warning: format '%ld' expects argument of type 'long int', but argument 3 has type 'long long int' [-Wformat=]
+  436 |     pvt_raise_decode_error(rb_sprintf("Expected to read %d bytes for the hash but read %ld bytes", length, READ_PTR(b) - start_ptr));
+      |                                                                                        ~~^
+      |                                                                                          |
+      |                                                                                          long int
+      |                                                                                        %lld
+compiling util.c
+compiling write.c
+linking shared-object bson_native.so
+
+current directory: C:/Users/Clara/Documents/GitHub/Notes/vendor/bundle/ruby/3.1.0/gems/bson-4.15.0/ext/bson
+make DESTDIR\= sitearchdir\=./.gem.20230313-16072-bgeljh sitelibdir\=./.gem.20230313-16072-bgeljh install
+/usr/bin/install -c -m 0755 bson_native.so ./.gem.20230313-16072-bgeljh

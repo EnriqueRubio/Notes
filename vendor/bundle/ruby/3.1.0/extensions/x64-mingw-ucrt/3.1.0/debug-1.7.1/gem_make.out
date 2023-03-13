@@ -1,0 +1,17 @@
+current directory: C:/Users/Clara/Documents/GitHub/Notes/vendor/bundle/ruby/3.1.0/gems/debug-1.7.1/ext/debug
+C:/Ruby31-x64/bin/ruby.exe -I C:/Ruby31-x64/lib/ruby/3.1.0 extconf.rb
+creating Makefile
+
+current directory: C:/Users/Clara/Documents/GitHub/Notes/vendor/bundle/ruby/3.1.0/gems/debug-1.7.1/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20230313-16072-vuvzzd sitelibdir\=./.gem.20230313-16072-vuvzzd clean
+
+current directory: C:/Users/Clara/Documents/GitHub/Notes/vendor/bundle/ruby/3.1.0/gems/debug-1.7.1/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20230313-16072-vuvzzd sitelibdir\=./.gem.20230313-16072-vuvzzd
+generating debug-x64-mingw-ucrt.def
+compiling debug.c
+compiling iseq_collector.c
+linking shared-object debug/debug.so
+
+current directory: C:/Users/Clara/Documents/GitHub/Notes/vendor/bundle/ruby/3.1.0/gems/debug-1.7.1/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20230313-16072-vuvzzd sitelibdir\=./.gem.20230313-16072-vuvzzd install
+/usr/bin/install -c -m 0755 debug.so ./.gem.20230313-16072-vuvzzd/debug

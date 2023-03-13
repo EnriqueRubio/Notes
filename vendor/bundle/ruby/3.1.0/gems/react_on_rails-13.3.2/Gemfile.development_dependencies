@@ -1,0 +1,50 @@
+# frozen_string_literal: true
+
+gem "shakapacker", "6.5.1"
+gem "bootsnap", require: false
+gem "rails", "~> 7.0"
+gem "sqlite3"
+gem "sass-rails", "~> 6.0"
+gem "uglifier"
+gem "jquery-rails"
+gem "puma", "~> 5.0"
+
+# Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
+gem "turbolinks" if ENV["DISABLE_TURBOLINKS"].nil? || ENV["DISABLE_TURBOLINKS"].strip.empty?
+
+# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+gem "jbuilder"
+# bundle exec rake doc:rails generates the API under doc/api.
+gem "sdoc", group: :doc
+
+gem "sprockets", "~> 4.0"
+
+gem "amazing_print"
+
+group :development, :test do
+  gem "listen"
+  gem "pry"
+  gem "pry-byebug"
+  gem "pry-doc"
+  gem "pry-rails"
+  gem "pry-rescue"
+  gem "rubocop", "1.14.0", require: false
+  gem "rubocop-performance", "1.16.0", require: false
+  gem "rubocop-rspec", "2.4.0", require: false
+  gem "scss_lint", require: false
+  gem "spring", "~> 4.0"
+end
+
+group :test do
+  gem "capybara"
+  gem "capybara-screenshot"
+  gem "coveralls", require: false
+  gem "equivalent-xml"
+  gem "generator_spec"
+  gem "launchy"
+  gem "rspec_junit_formatter"
+  gem "rspec-rails"
+  gem "rspec-retry"
+  gem "selenium-webdriver"
+  gem "webdrivers", "3.9.4"
+end
