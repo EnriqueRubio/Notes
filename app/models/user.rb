@@ -9,5 +9,5 @@ class User
     field :admin, type: Boolean
 
     validates_presence_of :username, :email, :password, :admin
-    validates_uniqueness_of :email
+    validates_uniqueness_of :email   
 end

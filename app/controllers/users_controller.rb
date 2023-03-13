@@ -1,6 +1,7 @@
 class UsersController < ApplicationController 
   def index 
     @users = User.all 
+    current_user = User.find_by_id(session[:current_user_id])
       if @users render json: { 
         users: @users
       }
