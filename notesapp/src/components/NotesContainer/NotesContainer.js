@@ -6,6 +6,11 @@ import "./notesContainer.css"
 
 const API_URL_NOTES = "http://localhost:3000/api/notes";
 
+let estado = 0;
+let titulo_estado;
+let contenido_estado;
+let note_data;
+
 function changeBackground() {
   let R = Math.floor((Math.random() * 127) + 127);
   let G = Math.floor((Math.random() * 127) + 127);
@@ -15,7 +20,27 @@ function changeBackground() {
   return `#${rgb.toString(16)}`;
 }
 
+function guardarEstado(e) {
 
+  const array_estado = e.currentTarget.id.split(",");
+  estado = array_estado[0];
+  titulo_estado = array_estado[1];
+  contenido_estado = array_estado[2];
+}
+
+function cargarModalVer() {
+  const title_n = document.getElementById("showNoteTitle");
+  const content_n = document.getElementById("showNoteContent");
+  title_n.innerHTML  = titulo_estado;
+  content_n.innerHTML  = contenido_estado;
+}
+
+function cargarModalActu() {
+  const title_n = document.getElementById("updateNoteTitle");
+  const content_n = document.getElementById("updateNoteContent");
+  title_n.value = titulo_estado;
+  content_n.value = contenido_estado;
+}
 
 const NoteContainer = () => {
 
@@ -24,6 +49,7 @@ const NoteContainer = () => {
   useEffect(() => {
     axios.get(API_URL_NOTES)
       .then(response => {
+        note_data = response.data;
         setNotes(response.data);
       })
       .catch(error => {
@@ -32,55 +58,75 @@ const NoteContainer = () => {
 
   }, []);
 
-  const handlerEditNote = function(e){
-     
+  const handlerEditNote = function () {
+
     let new_title = document.getElementById('updateNoteTitle').value;
     let new_content = document.getElementById('updateNoteContent').value;
-    let note_id = e.target.getAttribute("data-index");
-    
+    let note_id;
+
+    for (var element in note_data) {
+      if (element === estado) {
+        note_id = note_data[element]._id.$oid;
+      }
+
+    }
+
+    //Actualizamos
     axios.put(`${API_URL_NOTES}/${note_id}`, {
-      title: new_title,
-      content: new_content
+      "note":
+      {
+        "title": new_title,
+        "content": new_content
+      }
     })
       .then((response) => {
         setNotes(response.data);
       });
+
+    //Recargamos
+    window.location.reload();
   }
 
-  const cards = notes.map(note => {
+  const cards = notes.map((note, i) => {
     const bgColor = changeBackground();
     return (
 
-      <div key={note._id} class="card" style={{ width: "18rem", backgroundColor: bgColor }} >
+      <div class="card" style={{ width: "18rem", backgroundColor: bgColor }}>
 
         <div class="card-body">
-          <div data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#showModal">
+          <div data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#showModal" id={[i, note.title, note.content]} onMouseEnter={guardarEstado} onClick={cargarModalVer}>
             <h5 class="card-title"><strong>{note.title}</strong></h5>
 
             <p class="card-text"><strong>{note.content}</strong></p>
+
           </div>
 
-          <div class="class-icons">
+          <div class="class-icons" id={[i, note.title, note.content]} onMouseEnter={guardarEstado}>
+
             <div class="class-icon" >
-              <svg data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#editModal" cursor="pointer"
+              <svg cursor="pointer"
                 xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share-fill" viewBox="0 0 16 16">
                 <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z" />
               </svg>
             </div>
 
-            <div class="class-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+            <div class="class-icon" onClick={cargarModalActu}>
+              <svg data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#editModal" cursor="pointer"
+                xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                 <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
                 <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
               </svg>
             </div>
 
             <div class="class-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+              <svg cursor="pointer"
+                xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
                 <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
               </svg>
             </div>
+
           </div>
+
         </div>
 
         {/* Modal para ver la nota */}
@@ -90,13 +136,11 @@ const NoteContainer = () => {
             <div class="modal-content">
 
               <div class="modal-header">
-                <h1 class="modal-title fs-5" id="showModalLabel">{note.title}</h1>
+                <h1 class="modal-title fs-5" id="showNoteTitle">test</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
 
-              <div class="modal-body">
-                {note.content}
-              </div>
+              <div class="modal-body" id="showNoteContent"></div>
 
               <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -115,19 +159,19 @@ const NoteContainer = () => {
               <div class="modal-header">
                 <h1 class="modal-title fs-5" id="editModalLabel">
                   Editar Nota:
-                  <input id="updateNoteTitle" type="text" defaultValue={note.title} />
+                  <input id="updateNoteTitle" type="text" defaultValue="test" />
                 </h1>
-                
+
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
 
               <div class="modal-body">
-                <textarea id="updateNoteContent" defaultValue={note.content} rows="4" cols="60"/>
+                <textarea id="updateNoteContent" defaultValue="test" rows="4" cols="60" />
               </div>
 
               <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-outline-success" data-index={note._id.$oid} onClick={ handlerEditNote }>Actualizar Nota</button>
+                <button type="button" class="btn btn-outline-success" onClick={handlerEditNote}>Actualizar Nota</button>
               </div>
 
             </div>
@@ -148,29 +192,6 @@ const NoteContainer = () => {
       {cards};
 
     </div>
-
-
-    /* <div class="card-deck">
-        {notes.map(note => (
-          
-            <div key={note.id} class="card">
-              
-                <div class="card-header">
-                  <h5 class="card-title">{note.title}</h5>
-                </div>
-                <div class="card-body">
-                  <p class="card-text">{note.content}</p>
-                </div>
-                <div class="card-footer">
-                  <small class="text-muted">{note.creation_date}</small>
-                </div>
-              
-            </div>
-         
-        ))};
-      
-    </div> */
-
 
   );
 

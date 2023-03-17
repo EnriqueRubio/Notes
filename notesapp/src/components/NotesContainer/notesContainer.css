@@ -8,6 +8,10 @@
 	);
 }
 
+.card {
+    margin: 5px 5px 5px 5px;;
+}
+
 .class-icons{
 	display: flex;
 	float: right;
