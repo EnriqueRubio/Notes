@@ -18,7 +18,7 @@ class Api::NotesController < ApplicationController
   def create
     @note = Note.new(note_params)
     #@note.author_id = current_api_user
-    @note.author_id = User.find_by!(_id: "6414a707a0d9cb8ace75e4c6")
+    @note.author_id = User.find_by!(_id: "64136824b064af32941a7b13")
     if @note.save
       render json: @note, status: :created
     else
@@ -29,7 +29,7 @@ class Api::NotesController < ApplicationController
   # PATCH/PUT /notes/1
   def update
     #@note.author_id = current_api_user
-    @note.author_id = User.find_by!(_id: "6414a707a0d9cb8ace75e4c6")
+    @note.author_id = User.find_by!(_id: "64136824b064af32941a7b13")
     if @note.update(note_params)
       render json: @note
     else
