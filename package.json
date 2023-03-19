@@ -5,6 +5,7 @@
     "webpack-cli": "3.3.12"
   },
   "devDependencies": {
-    "webpack-dev-server": "3"
+    "webpack-dev-server": "3",
+    "react-icons": "^4.8.0"
   }
 }
