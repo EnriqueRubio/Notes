@@ -51,10 +51,22 @@ function cargarModalVer() {
 }
 
 function cargarModalActu() {
+  reinicioValidaciones();
   const title_n = document.getElementById("updateNoteTitle");
   const content_n = document.getElementById("updateNoteContent");
   title_n.value = titulo_estado;
   content_n.value = contenido_estado;
+}
+
+function limpiarCrear() {
+  reinicioValidaciones();
+  document.getElementById('createNoteTitle').value ="";
+  document.getElementById('createNoteContent').value="";
+}
+
+function reinicioValidaciones() {
+  document.getElementById('validacionCrear').style.display = "none";
+  document.getElementById('validacionEdit').style.display = "none";
 }
 
 function notification(action) {
@@ -112,26 +124,31 @@ const NoteContainer = () => {
     let new_content = document.getElementById('updateNoteContent').value;
     let note_id;
 
-    for (var element in note_data) {
-      if (element === estado) {
-        note_id = note_data[element]._id.$oid;
+    if (new_title === "" || new_content === "") {
+      document.getElementById('validacionEdit').style.display = "block";
+    } else {
+
+      for (var element in note_data) {
+        if (element === estado) {
+          note_id = note_data[element]._id.$oid;
+        }
+
       }
 
+      //Actualizamos
+      axios.put(`${API_URL_NOTES}/${note_id}`, {
+        "note":
+        {
+          "title": new_title,
+          "content": new_content
+        }
+      })
+        .then(() => {
+          document.getElementById("btnUpdateClose").click();
+          reloadData();
+          notification(2);
+        });
     }
-
-    //Actualizamos
-    axios.put(`${API_URL_NOTES}/${note_id}`, {
-      "note":
-      {
-        "title": new_title,
-        "content": new_content
-      }
-    })
-      .then(() => {
-        document.getElementById("btnUpdateClose").click();
-        reloadData();
-        notification(2);
-      });
 
   }
 
@@ -142,24 +159,27 @@ const NoteContainer = () => {
     let create_title = document.getElementById('createNoteTitle').value;
     let create_content = document.getElementById('createNoteContent').value;
 
-    //Creamos
-    axios.post(`${API_URL_NOTES}`, {
-      "note":
-      {
-        "title": create_title,
-        "creation_date": creation_date,
-        "content": create_content
-      }
-    })
-      .then(() => {
-        document.getElementById("btnCreateClose").click();
-        reloadData();
-        document.getElementById('createNoteTitle').value = "";
-        document.getElementById('createNoteContent').value = "";
-        notification(1);
-      });
+    if (create_title === "" || create_content === "") {
+      document.getElementById('validacionCrear').style.display = "block";
+    } else {
+      //Creamos
+      axios.post(`${API_URL_NOTES}`, {
+        "note":
+        {
+          "title": create_title,
+          "creation_date": creation_date,
+          "content": create_content
+        }
+      })
+        .then(() => {
+          document.getElementById("btnCreateClose").click();
+          reloadData();
+          document.getElementById('createNoteTitle').value = "";
+          document.getElementById('createNoteContent').value = "";
+          notification(1);
+        });
 
-
+    }
   }
 
   const handlerDeleteNote = function () {
@@ -186,7 +206,7 @@ const NoteContainer = () => {
 
     <div>
       <button class="btn btn-primary" type="submit"
-        data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#createModal" cursor="pointer">
+        data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#createModal" cursor="pointer" onClick={limpiarCrear}>
         Crear Nota
       </button>
 
@@ -287,6 +307,10 @@ const NoteContainer = () => {
                         <textarea id="updateNoteContent" defaultValue="test" rows="4" cols="60" />
                       </div>
 
+                      <div id="validacionEdit" style={{ display: "none" }} class="alert alert-warning" role="alert">
+                        Debes rellenar todos los campos.
+                      </div>
+
                       <div class="modal-footer">
                         <button id="btnUpdateClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
                         <button type="button" class="btn btn-outline-success" onClick={handlerEditNote}>Actualizar Nota</button>
@@ -313,6 +337,10 @@ const NoteContainer = () => {
 
                       <div class="modal-body">
                         <textarea id="createNoteContent" defaultValue="" rows="4" cols="60" />
+                      </div>
+
+                      <div id="validacionCrear" style={{ display: "none" }} class="alert alert-warning" role="alert">
+                        Debes rellenar todos los campos.
                       </div>
 
                       <div class="modal-footer">
@@ -352,7 +380,7 @@ const NoteContainer = () => {
 
           );
 
-        })};
+        })}
 
       </div>
     </div>
