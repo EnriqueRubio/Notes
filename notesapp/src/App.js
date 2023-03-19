@@ -7,14 +7,25 @@ import { useEffect, useState } from "react";
 
 
 
+import NotesContainer from "./components/NotesContainer/NotesContainer";
+import NavBar from './components/NavBar/NavBar';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Informacion from './components/Informacion/Informacion';
 
 const App = () => {
   return (
 
     <div>
-      <h1>My Notes App</h1>
-
-      <NoteContainer />
+      <header><NavBar /></header>
+      <Router>
+        <Routes >
+          <Route path="/" element={<NotesContainer />}></Route>
+          <Route path="/informacion" element={<Informacion />}></Route>
+          <Route path="/ajustes"></Route>
+        </Routes>
+      </Router>
+      <body>
+      </body>
 
     </div>
   );
