@@ -1,34 +1,43 @@
-import './App.css';
+import "./App.css";
+import React, { Component } from "react";
 import axios from "axios";
-import Notes from "./components/notes";
+import NoteContainer from "./components/NotesContainer/NotesContainer";
 import { useEffect, useState } from "react";
 
+import NotesContainer from "./components/NotesContainer/NotesContainer";
+import NavBar from "./components/NavBar/NavBar";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Informacion from "./components/Informacion/Informacion";
 
-const API_URL = "http://localhost:3000/api/notes"
+import AuthService from "./services/auth.service";
+import Login from "./components/login.component";
+import Register from "./components/register.component";
+import Profile from "./components/profile.component";
+import BoardUser from "./components/board-user.component";
+import BoardAdmin from "./components/board-admin.component";
+import NotFound from "./components/NotFound";
+import MainLayout from "./components/MainLayout";
 
-function getAPIData() {
-  return axios.get(API_URL).then((response) => response.data)
-}
+class App extends Component {
+  // ... (constructor, componentDidMount, logOut)
 
-function App() {
-  const [notes, setNotes] = useState([]);
-
-  useEffect(() => {
-    let mounted = true;
-    getAPIData().then((items) => {
-      if(mounted) {
-        setNotes(items);
-      }
-    });
-    return () => (mounted = false);
-  }, []);
-
-  return (
-    <div className="App">
-      <h1>Notas</h1>
-      <Notes notes={notes}/>
-    </div>
-  );
+  render() {
+    return (
+      <div>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<NotesContainer />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/user" element={<BoardUser />} />
+            <Route path="/admin" element={<BoardAdmin />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </div>
+    );
+  }
 }
 
 export default App;

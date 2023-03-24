@@ -35,5 +35,14 @@ module NotesApp
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    # Session management (cookies)
+    #config.session_store :cookie_store, key: '_interslice_session'
+    #config.middleware.use ActionDispatch::Cookies
+    #config.middleware.use config.session_store, config.session_options
+
+    config.middleware.use Warden::Manager do |manager|
+      manager.default_strategies(:scope => :api_user).unshift :jwt
+    end
   end
 end

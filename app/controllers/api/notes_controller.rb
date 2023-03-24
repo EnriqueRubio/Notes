@@ -1,11 +1,10 @@
 class Api::NotesController < ApplicationController
   before_action :set_note, only: %i[ show update destroy ]
-  #before_action :authenticate_api_user!
+  before_action :authenticate_api_user!
 
   # GET /notes
   def index
-    @notes = Note.all
-
+    @notes = Note.where(author_id: current_api_user.id)
     render json: @notes
   end
 
@@ -17,8 +16,8 @@ class Api::NotesController < ApplicationController
   # POST /notes
   def create
     @note = Note.new(note_params)
-    #@note.author_id = current_api_user
-    @note.author_id = User.find_by!(_id: "64136824b064af32941a7b13")
+    @note.author_id = current_api_user.id
+
     if @note.save
       render json: @note, status: :created
     else
@@ -28,8 +27,8 @@ class Api::NotesController < ApplicationController
 
   # PATCH/PUT /notes/1
   def update
-    #@note.author_id = current_api_user
-    @note.author_id = User.find_by!(_id: "64136824b064af32941a7b13")
+    @note.author_id = current_api_user.id
+
     if @note.update(note_params)
       render json: @note
     else
@@ -43,13 +42,14 @@ class Api::NotesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_note
-      @note = Note.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def note_params
-      params.require(:note).permit(:title, :creation_date, :content, :attachments)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_note
+    @note = Note.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def note_params
+    params.require(:note).permit(:title, :creation_date, :content, :attachments)
+  end
 end
