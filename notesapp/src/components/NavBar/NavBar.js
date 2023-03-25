@@ -1,8 +1,6 @@
-
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import 'bootstrap/dist/js/bootstrap.min.js'
 import React from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Navbar, Nav, NavDropdown, Form, FormControl, Button } from 'react-bootstrap';
 import "./NavBar.css"
 import "../NotesContainer/NotesContainer"
 import AuthService from "../../services/auth.service";
@@ -18,52 +16,48 @@ function logOut() {
 
 function NavBar() {
   return (
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <Navbar bg="dark" expand="lg" variant="dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-          My Notes App
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href='/collections'>Colecciones</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href='/friends'>Amigos</a>
-            </li>
-          </ul>
-          <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search"></input>
-            <button class="btn btn-outline-success" type="submit">Buscar</button>
-          </form>
-    <ul class="navbar-nav">
-        <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <img src="https://s3.eu-central-1.amazonaws.com/bootstrapbaymisc/blog/24_days_bootstrap/fox.jpg" width="40" height="40" class="rounded-circle" alt="User profile"/>
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" href="/profile">Perfil</a>
-          <a class="dropdown-item" href="/settings">Ajustes</a>
-          <a class="dropdown-item" href="/login" onClick={logOut}>Logout</a>
-        </div>
-      </li>   
-    </ul>
-        </div>
+        <Navbar.Brand href="/">My Notes App</Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbarSupportedContent" />
+        <Navbar.Collapse id="navbarSupportedContent">
+          <Nav className="me-auto mb-2 mb-lg-0">
+            <Nav.Link href="/collections">Colecciones</Nav.Link>
+            <Nav.Link href="/friends">Amigos</Nav.Link>
+          </Nav>
+          <Form className="d-flex" role="search">
+            <FormControl
+              type="search"
+              placeholder="Buscar"
+              className="me-2"
+              aria-label="Search"
+            />
+            <Button type="submit">Buscar</Button>
+          </Form>
+          <Nav>
+            <NavDropdown
+              title={
+                <img
+                  src="https://s3.eu-central-1.amazonaws.com/bootstrapbaymisc/blog/24_days_bootstrap/fox.jpg"
+                  width="40"
+                  height="40"
+                  className="rounded-circle"
+                  alt="User profile"
+                />
+              }
+              id="navbarDropdownMenuLink"
+            >
+              <NavDropdown.Item href="/profile">Perfil</NavDropdown.Item>
+              <NavDropdown.Item href="/settings">Ajustes</NavDropdown.Item>
+              <NavDropdown.Item href="/login" onClick={logOut}>
+                Logout
+              </NavDropdown.Item>
+            </NavDropdown>
+          </Nav>
+        </Navbar.Collapse>
       </div>
-    </nav>
+    </Navbar>
   );
 }
 
 export default NavBar;
-
-
-
-
-
-
-
-

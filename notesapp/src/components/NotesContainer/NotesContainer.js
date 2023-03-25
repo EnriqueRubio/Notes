@@ -275,6 +275,38 @@ const NoteContainer = () => {
 
     <div class="card-deck">
 
+      {/* Modal para crear la nota */}
+
+        <div class="modal fade" id="createModal" aria-labelledby="createModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="createModalLabel">
+                  Título:
+                  <input id="createNoteTitle" type="text" defaultValue="" />
+                </h1>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <div class="modal-body">
+                <textarea id="createNoteContent" defaultValue="" rows="4" cols="60" />
+              </div>
+
+              <div id="validacionCrear" style={{ display: "none" }} class="alert alert-warning" role="alert">
+                Debes rellenar todos los campos.
+              </div>
+
+              <div class="modal-footer">
+                <button id="btnCreateClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-outline-success" onClick={handlerCreateNote}>Crear Nota</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
       {notes.map((note, i) => {
         const bgColor = changeBackground();
         return (
@@ -366,38 +398,6 @@ const NoteContainer = () => {
                     <div class="modal-footer">
                       <button id="btnUpdateClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
                       <button type="button" class="btn btn-outline-success" onClick={handlerEditNote}>Actualizar Nota</button>
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal para crear la nota */}
-
-              <div class="modal fade" id="createModal" aria-labelledby="createModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-
-                    <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="createModalLabel">
-                        Título:
-                        <input id="createNoteTitle" type="text" defaultValue="" />
-                      </h1>
-
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body">
-                      <textarea id="createNoteContent" defaultValue="" rows="4" cols="60" />
-                    </div>
-
-                    <div id="validacionCrear" style={{ display: "none" }} class="alert alert-warning" role="alert">
-                      Debes rellenar todos los campos.
-                    </div>
-
-                    <div class="modal-footer">
-                      <button id="btnCreateClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-                      <button type="button" class="btn btn-outline-success" onClick={handlerCreateNote}>Crear Nota</button>
                     </div>
 
                   </div>

@@ -31,7 +31,6 @@ class App extends Component {
             <Route index element={<NotesContainer />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/user" element={<BoardUser />} />
-            <Route path="/admin" element={<BoardAdmin />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
