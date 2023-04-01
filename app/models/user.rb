@@ -1,5 +1,7 @@
 class User
     include Mongoid::Document
+    include CarrierWave::Mongoid
+    include Mongoid::Timestamps
     # Include default devise modules. Others available are:
     # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
     devise :database_authenticatable, :registerable,
@@ -38,8 +40,8 @@ class User
     #include ActiveModel::SecurePassword
   
     field :username, type: String
-    #field :email, type: String
-    #field :password, type: String
+    field :avatar, type: String
+    mount_uploader :avatar, AvatarUploader
     field :admin, type: Boolean, default: false
   
     #has_secure_password

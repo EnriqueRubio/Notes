@@ -1,61 +1,41 @@
-import React, { Component } from "react";
-import { Navigate } from "react-router-dom";
-import AuthService from "../services/auth.service";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { Modal, ListGroup, Form, Button, Offcanvas, Accordion } from 'react-bootstrap';
+import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
+import { BsTrash, BsFillPlusSquareFill, BsXSquare, BsCheckSquare } from 'react-icons/bs';
+import { Toast } from 'bootstrap'
+import AuthService from '../services/auth.service';
+import AuthHeader from "../services/auth-header";
 
-export default class Profile extends Component {
-  constructor(props) {
-    super(props);
+const API_URL_USERS = "http://localhost:3000/api/users/";
+let notification_title;
+let notification_content;
 
-    this.state = {
-      redirect: null,
-      userReady: false,
-      currentUser: { username: "" }
-    };
-  }
+const Profile = () => {
+  const user = AuthService.getCurrentUser();
 
-  componentDidMount() {
-    const currentUser = AuthService.getCurrentUser();
+  console.log(user);
 
-    if (!currentUser) this.setState({ redirect: "/login" });
-    this.setState({ currentUser: currentUser, userReady: true })
-  }
-
-  render() {
-    if (this.state.redirect) {
-      return <Navigate to={this.state.redirect} />
-    }
-
-    const { currentUser } = this.state;
-
-    return (
+  return (
       <div className="container">
-        {(this.state.userReady) ?
         <div>
         <header className="jumbotron">
           <h3>
-            <strong>{currentUser.username}</strong> Profile
+            <strong>{user.username}</strong> Profile
           </h3>
         </header>
         <p>
-          <strong>Token:</strong>{" "}
-          {currentUser.accessToken.substring(0, 20)} ...{" "}
-          {currentUser.accessToken.substr(currentUser.accessToken.length - 20)}
-        </p>
-        <p>
           <strong>Id:</strong>{" "}
-          {currentUser.id}
+          {user._id.$oid}
         </p>
         <p>
           <strong>Email:</strong>{" "}
-          {currentUser.email}
+          {user.email}
         </p>
-        <strong>Authorities:</strong>
-        <ul>
-          {currentUser.roles &&
-            currentUser.roles.map((role, index) => <li key={index}>{role}</li>)}
-        </ul>
-      </div>: null}
       </div>
-    );
-  }
+      </div>
+  );
 }
+
+export default Profile;

@@ -11,6 +11,10 @@ gem "devise"
 gem "devise-jwt"
 gem "devise_token_auth"
 
+# Image management
+gem "carrierwave"
+gem "carrierwave-mongoid"
+
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", "~> 5.0"
 

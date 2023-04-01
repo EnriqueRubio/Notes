@@ -41,6 +41,35 @@ class Api::NotesController < ApplicationController
     @note.destroy
   end
 
+  # GET /users/search
+  def search
+    query = params[:q]
+    if query.present?
+      notes = Note.or(
+        { author: current_api_user, title:  /#{query}/i },
+        { author: current_api_user, content:  /#{query}/i }
+      )
+
+      if notes.any?
+        render json: { notes: notes }, status: :ok
+      else
+        render json: { message: "No notes found." }, status: :ok
+      end
+    else
+      render json: { message: "Search query is empty." }, status: :bad_request
+    end
+  end
+
+  # Get /notes/by_collections/:collection_id
+  def by_collections
+    collection_ids = params[:collection_ids].split(',').map(&:strip)
+    puts("Collection ids: #{collection_ids.inspect}")
+    @notes = Note.in(parent_collection_id: collection_ids)
+    puts("Notes: #{@notes}")
+    render json: @notes
+  end
+
+
   private
 
   # Use callbacks to share common setup or constraints between actions.
@@ -50,6 +79,6 @@ class Api::NotesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def note_params
-    params.require(:note).permit(:title, :creation_date, :content, :attachments)
+    params.require(:note).permit(:title, :creation_date, :content, :attachments, :avatar)
   end
 end

@@ -5,11 +5,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import "./notesContainer.css";
 import { Toast } from 'bootstrap'
+import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
+import { FaPlus } from 'react-icons/fa';
+import { BiListPlus, BiShareAlt, BiEdit, BiTrash } from 'react-icons/bi';
 import AuthService from '../../services/auth.service';
 import AuthHeader from "../../services/auth-header";
+import FriendsSidebar from '../FriendsSidebar/FriendsSidebar';
 
 const API_URL_NOTES = "http://localhost:3000/api/notes";
-
+const API_URL_COLLECTIONS = "http://localhost:3000/api/collections";
 
 let estado = 0;
 let titulo_estado;
@@ -119,6 +123,7 @@ function notification(action) {
 const NoteContainer = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notes, setNotes] = useState([]);
+  const [collections, setCollections] = useState([]);
   const navigate = useNavigate();
 
   const reloadData = async () => {
@@ -145,6 +150,21 @@ const NoteContainer = () => {
     }
     reloadData();
   }, [navigate]);
+
+  useEffect(() => {
+    // Llama a la función fetchCollections para obtener la lista de colecciones
+    // y actualiza el estado 'collections' cuando el componente se monta
+    try {
+      axios.get(API_URL_COLLECTIONS, { headers: AuthHeader() }).then(response => {
+        setCollections(response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    } catch (error) {
+      console.error('Error fetching friends data:', error);
+    }
+  }, []);
 
   const handlerEditNote = function () {
 
@@ -252,15 +272,42 @@ const NoteContainer = () => {
       });
 
   }
+  
+  async function addNoteToCollection(collectionId, noteId) {
+    axios.post(`${API_URL_COLLECTIONS}/${collectionId}/add_note`, 
+    {
+      "note_id": noteId
+    },
+    {
+      headers: {
+        ...AuthHeader(),
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    }
+  )
+  .then(() => {
+      // Mostrar mensaje de éxito y marcar la colección como seleccionada
+    });
+  }
+  
+  const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
+    <span
+      ref={ref}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick(e);
+      }}
+    >
+      {children}
+    </span>
+  ));
+  
 
   return (
     <>
       {isLoggedIn ? (
     <div>
-    <button class="btn btn-primary" type="submit" style={{ marginLeft: 35 }}
-      data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#createModal" cursor="pointer" onClick={limpiarCrear}>
-      Crear Nota
-    </button>
 
     <div id="toast" role="alert" style={{ position: "absolute", top: 0, right: 0 }} aria-live="assertive"
       aria-atomic="true" class="toast" >
@@ -272,7 +319,7 @@ const NoteContainer = () => {
         {notification_content}
       </div>
     </div>
-
+    <FriendsSidebar />
     <div class="card-deck">
 
       {/* Modal para crear la nota */}
@@ -313,9 +360,9 @@ const NoteContainer = () => {
 
 
           <div>
-            <div class="card" style={{ margin: "5px 5px 5px 5px", width: "18rem", backgroundColor: bgColor }}>
+            <div class="card" style={{ padding: "10px 20px 0px", margin: "5px 5px 5px 5px", width: "18rem", height: "15rem", backgroundColor: bgColor }}>
 
-              <div class="card-body">
+              <div class="card-body" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }} >
                 <div data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#showModal" id={[i, note.title, note.content]} onMouseEnter={guardarEstado} onClick={cargarModalVer}>
                   <h5 class="card-title"><strong>{note.title}</strong></h5>
 
@@ -325,31 +372,39 @@ const NoteContainer = () => {
 
                 <div class="class-icons" id={[i, note.title, note.content]} onMouseEnter={guardarEstado}>
 
-                  <div class="class-icon" >
-                    <svg cursor="pointer"
-                      xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share-fill" viewBox="0 0 16 16">
-                      <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z" />
-                    </svg>
-                  </div>
+                <div class="class-icon">
+                  <Dropdown>
+                    <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components">
+                      <BiListPlus size="1.7rem" cursor="pointer" />
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      {collections.map((collection) => (
+                        <Dropdown.Item
+                          key={collection._id.$oid}
+                          onClick={() => addNoteToCollection(collection._id.$oid, note._id.$oid)}
+                        >
+                          {collection.title}
+                        </Dropdown.Item>
+                      ))}
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
 
-                  <div class="class-icon" onClick={cargarModalActu}>
-                    <svg data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#editModal" cursor="pointer"
-                      xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                      <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
-                    </svg>
-                  </div>
+                <div class="class-icon" >
+                    <BiShareAlt size="1.5rem" />
+                </div>
 
-                  <div class="class-icon">
-                    <svg data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#deleteModal" cursor="pointer"
-                      xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
-                    </svg>
-                  </div>
+                <div class="class-icon" onClick={cargarModalActu}>
+                  <BiEdit size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#editModal" cursor="pointer" />
+                </div>
 
+                <div class="class-icon">
+                  <BiTrash size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#deleteModal" cursor="pointer" />
                 </div>
 
               </div>
+
+            </div>
 
               {/* Modal para ver la nota */}
 
@@ -435,6 +490,9 @@ const NoteContainer = () => {
       })}
 
     </div>
+    <Button className="floating-button" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#createModal" onClick={limpiarCrear}>
+        <FaPlus />
+    </Button>
   </div>
       ) : (
         // Renderiza un mensaje de error o redirecciona al usuario

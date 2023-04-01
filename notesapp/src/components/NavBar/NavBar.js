@@ -1,5 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { NavLink } from 'react-router-dom';
 import { Navbar, Nav, NavDropdown, Form, FormControl, Button } from 'react-bootstrap';
 import "./NavBar.css"
 import "../NotesContainer/NotesContainer"
@@ -14,6 +15,9 @@ function logOut() {
   });
 }
 
+const API_URL = "http://localhost:3000";
+const currentUser = AuthService.getCurrentUser();
+
 function NavBar() {
   return (
     <Navbar bg="dark" expand="lg" variant="dark">
@@ -22,9 +26,23 @@ function NavBar() {
         <Navbar.Toggle aria-controls="navbarSupportedContent" />
         <Navbar.Collapse id="navbarSupportedContent">
           <Nav className="me-auto mb-2 mb-lg-0">
-            <Nav.Link href="/collections">Colecciones</Nav.Link>
-            <Nav.Link href="/friends">Amigos</Nav.Link>
+            <Nav.Item>
+              <NavLink to="/" exact activeClassName="active" className="nav-link">
+                Notas
+              </NavLink>
+            </Nav.Item>
+            <Nav.Item>
+              <NavLink to="/collections" activeClassName="active" className="nav-link">
+                Colecciones
+              </NavLink>
+            </Nav.Item>
+            <Nav.Item>
+              <NavLink to="/friends" activeClassName="active" className="nav-link">
+                Amigos
+              </NavLink>
+            </Nav.Item>
           </Nav>
+
           <Form className="d-flex" role="search">
             <FormControl
               type="search"
@@ -38,7 +56,7 @@ function NavBar() {
             <NavDropdown
               title={
                 <img
-                  src="https://s3.eu-central-1.amazonaws.com/bootstrapbaymisc/blog/24_days_bootstrap/fox.jpg"
+                  src={currentUser.avatar.url ? API_URL + currentUser.avatar.url : "https://s3.eu-central-1.amazonaws.com/bootstrapbaymisc/blog/24_days_bootstrap/fox.jpg"}
                   width="40"
                   height="40"
                   className="rounded-circle"
