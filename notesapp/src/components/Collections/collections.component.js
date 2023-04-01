@@ -480,7 +480,7 @@ const Collections = () => {
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Introduce el título"
-                                                value={editingCollection ? editingCollection.title : title}
+                                                value={title ? title : ( editingCollection ? editingCollection.title : 'Título')}
                                                 onChange={handleInputChange('title')}
                                             />
                                         </Form.Group>
@@ -490,7 +490,7 @@ const Collections = () => {
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Introduce la descripción"
-                                                value={editingCollection ? editingCollection.description : description}
+                                                value={description ? description : ( editingCollection ? editingCollection.description : 'Descripción')}
                                                 onChange={handleInputChange('description')}
                                             />
                                         </Form.Group>
@@ -534,8 +534,8 @@ const Collections = () => {
                                                 color: selectedTheme.textColor,
                                             }}
                                         >
-                                            <Card.Title>{editingCollection ? editingCollection.title : title}</Card.Title>
-                                            <Card.Text>{editingCollection ? editingCollection.description : description}</Card.Text>
+                                            <Card.Title>{title ? title : ( editingCollection ? editingCollection.title : 'Título')}</Card.Title>
+                                            <Card.Text>{description ? description : ( editingCollection ? editingCollection.description : 'Descripción')}</Card.Text>
                                         </Card.Body>
                                         <ListGroup className="list-group-flush">
                                             <ListGroup.Item>Nota 1</ListGroup.Item>

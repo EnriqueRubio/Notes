@@ -36,11 +36,6 @@ function NavBar() {
                 Colecciones
               </NavLink>
             </Nav.Item>
-            <Nav.Item>
-              <NavLink to="/friends" activeClassName="active" className="nav-link">
-                Amigos
-              </NavLink>
-            </Nav.Item>
           </Nav>
 
           <Form className="d-flex" role="search">
