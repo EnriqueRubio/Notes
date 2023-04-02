@@ -324,16 +324,6 @@ const Collections = () => {
         );
     };
     
-    // Función para compartir la nota
-    const handleShareNote = (note) => {
-        // Implementa la lógica para compartir la nota
-        // Por ejemplo, copia el enlace de la nota al portapapeles o comparte a través de las redes sociales
-    
-        console.log("Compartir nota:", note);
-    
-        // Cierra el modal después de compartir la nota
-        setShowNoteModal(false);
-    };
 
     const handleNoteInputChange = (field) => (e) => {
         if (field === 'noteTitle') {
@@ -405,6 +395,7 @@ const Collections = () => {
         <>
         {isLoggedIn ? (
             <Container fluid="xxl">
+                <FriendsSidebar />
                 <Row>
                     {collections.map((collection) => (
                         <Col key={collection.id} style={{ maxWidth: "20rem" }} >
@@ -617,9 +608,6 @@ const Collections = () => {
                         </Button>
                         <Button variant="danger" onClick={() => handleDeleteNoteModal(selectedNote)}>
                         Eliminar
-                        </Button>
-                        <Button variant="primary" onClick={() => handleShareNote(selectedNote)}>
-                        Compartir
                         </Button>
                         <Button variant="success" onClick={() => handleSaveChanges(selectedNote)}>
                         Guardar cambios

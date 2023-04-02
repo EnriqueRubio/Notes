@@ -1,5 +1,5 @@
 class Api::UsersController < ApplicationController
-  before_action :set_user, only: %i[ show update destroy ]
+  before_action :set_user, only: %i[ show update destroy number_of_notes number_of_collections ]
   before_action :authenticate_api_user!
 
   # GET /users
@@ -40,29 +40,38 @@ class Api::UsersController < ApplicationController
     @user.destroy
   end
 
-# GET /users/search
-def search
-  query = params[:q]
+  # GET /users/search
+  def search
+    query = params[:q]
 
-  if query.present?
-    users = User.or({ username: /#{query}/i }, { email: /#{query}/i })
-    friends = Friendship.where(sender: current_api_user.id).or(Friendship.where(receiver: current_api_user.id))
-    friends_ids = friends.pluck(:sender_id, :receiver_id).flatten.uniq
-    users = users.not_in(id: friends_ids + [current_api_user.id])
-    puts("users: #{users}")
+    if query.present?
+      users = User.or({ username: /#{query}/i }, { email: /#{query}/i })
+      friends = Friendship.where(sender: current_api_user.id).or(Friendship.where(receiver: current_api_user.id))
+      friends_ids = friends.pluck(:sender_id, :receiver_id).flatten.uniq
+      users = users.not_in(id: friends_ids + [current_api_user.id])
+      puts("users: #{users}")
 
-    if users.any?
-      render json: users, status: :ok
+      if users.any?
+        render json: users, status: :ok
+      else
+        render json: { message: "No users found." }, status: :ok
+      end
     else
-      render json: { message: "No users found." }, status: :ok
+      render json: { message: "Search query is empty." }, status: :bad_request
     end
-  else
-    render json: { message: "Search query is empty." }, status: :bad_request
   end
-end
 
+  # GET /users/:id/number_of_notes
+  def number_of_notes
+    number_of_notes = Note.where(author: current_api_user.id).count
+    render json: { "number_of_notes": number_of_notes }, status: :ok
+  end
 
-
+  # GET /users/:id/number_of_collections
+  def number_of_collections
+    number_of_collections = Collection.where(author: current_api_user.id).count
+    render json: { "number_of_collections": number_of_collections }, status: :ok
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.

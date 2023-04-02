@@ -82,6 +82,40 @@ class Api::CollectionsController < ApplicationController
     @collection.destroy
   end
 
+  # Get /collections/shared_with_me
+  def shared_with_me
+    @collections = Collection.where(shared_to: current_api_user.id)
+    render json: @collections
+  end
+
+  # Get /collections/shared_to/:user_id
+  def shared_to
+    @collections = Collection.where(author: current_api_user.id, shared_to: params[:user_id])
+    render json: @collections
+  end
+
+  # Put /collections/:id/share
+  def share
+    @collection.shared_to << params[:user_id]
+    if @collection.save
+      render json: { message: 'Collection successfully shared' }, status: :ok
+    else
+      puts "Error saving collection: #{@collection.errors.full_messages}"
+      render json: { errors: @collection.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  # Put /collections/:id/unshare
+  def unshare
+    @collection.shared_to.delete(params[:user_id])
+    if @collection.save
+      render json: { message: 'Collection successfully unshared' }, status: :ok
+    else
+      puts "Error saving collection: #{@collection.errors.full_messages}"
+      render json: { errors: @collection.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def set_collection

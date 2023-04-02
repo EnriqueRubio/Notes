@@ -38,6 +38,42 @@ class Api::FriendshipsController < ApplicationController
         render json: @friends
     end
 
+    # GET /friendships/only_accepted
+    def only_accepted
+        @friendships = Friendship.or({ sender: current_api_user.id, status: "accepted" }, { receiver: current_api_user.id, status: "accepted" })
+        
+        # Hacer una lista de users que son amigos del usuario actual
+        @friends = []
+        @friendships.each do |friendship|
+            friend = nil
+            friend_status = nil
+            if friendship.sender == current_api_user
+                friend = friendship.receiver
+                if(friendship.status == "pending")
+                    friend_status = "sent"
+                else
+                    friend_status = "accepted"
+                end
+            else
+                friend = friendship.sender
+                if(friendship.status == "pending")
+                    friend_status = "received"
+                else
+                    friend_status = "accepted"
+                end
+            end
+            friend_data = {
+                relationship_id: friendship.id,
+                user: friend,
+                relationship_creation_date: friendship.created_at,
+                relationship_update_date: friendship.updated_at,
+                status: friend_status
+            }
+            @friends << friend_data
+        end
+        render json: @friends
+    end
+
     # GET /friendships/1
     def show
         render json: @friendship

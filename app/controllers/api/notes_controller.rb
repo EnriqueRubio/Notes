@@ -1,5 +1,5 @@
 class Api::NotesController < ApplicationController
-  before_action :set_note, only: %i[ show update destroy ]
+  before_action :set_note, only: %i[ show update destroy share unshare update_shared ]
   before_action :authenticate_api_user!
 
   # GET /notes
@@ -69,6 +69,60 @@ class Api::NotesController < ApplicationController
     render json: @notes
   end
 
+  # Get /notes/shared_with_me
+  def shared_with_me
+    @notes = Note.where(shared_to: current_api_user.id)
+    render json: @notes
+  end
+
+  # Get /notes/shared_to/:user_id
+  def shared_to
+    @notes = Note.where(author: current_api_user.id, shared_to: params[:user_id])
+    render json: @notes
+  end
+
+# Put /notes/:id/update_shared
+def update_shared
+  puts("LA NOTA: #{@note}")
+  puts("PARAMS: #{params[:shared_to]}")
+  # Convierte los elementos de la lista en objetos apropiados
+  shared_to_ids = params[:shared_to].map { |friend| friend["$oid"] }
+
+  # Busca los objetos User a partir de los IDs
+  shared_to_users = User.find(shared_to_ids)
+
+  # Asigna los objetos User a la lista shared_to de la nota
+  @note.shared_to = shared_to_users
+  if @note.save
+    render json: { message: 'Note successfully updated' }, status: :ok
+  else
+    puts "Error saving note: #{@note.errors.full_messages}"
+    render json: { errors: @note.errors.full_messages }, status: :unprocessable_entity
+  end
+end
+
+
+  # Put /notes/:id/share
+  def share
+    @note.shared_to << params[:user_id]
+    if @note.save
+      render json: { message: 'Note successfully shared' }, status: :ok
+    else
+      puts "Error saving note: #{@note.errors.full_messages}"
+      render json: { errors: @note.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  # Put /notes/:id/unshare
+  def unshare
+    @note.shared_to.delete(params[:user_id])
+    if @note.save
+      render json: { message: 'Note successfully unshared' }, status: :ok
+    else
+      puts "Error saving note: #{@note.errors.full_messages}"
+      render json: { errors: @note.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
 
   private
 

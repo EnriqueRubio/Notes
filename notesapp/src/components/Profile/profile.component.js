@@ -18,6 +18,7 @@ import {
 import AuthService from '../../services/auth.service';
 import AuthHeader from "../../services/auth-header";
 import './profile.component.css';
+import FriendsSidebar from '../FriendsSidebar/FriendsSidebar';
 
 const BASE_URL = "http://localhost:3000";
 const API_URL = "http://localhost:3000/api/users/";
@@ -34,6 +35,8 @@ const UserProfile = () => {
   const usernameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
+  const [number_of_notes, setNumber_of_notes] = useState(0);
+  const [number_of_collections, setNumber_of_collections] = useState(0);
 
   // Get user data from the backend
   useEffect(() => {
@@ -73,6 +76,36 @@ const UserProfile = () => {
       console.error('Error fetching friends data:', error);
     }
   }, []);
+
+  // Get number of notes and collections from the backend
+  useEffect(() => {
+    fetchNoteData();
+    fetchCollectionData();
+  }, []);
+
+  const fetchNoteData = async () => {
+    try {
+      const response = await axios.get(API_URL + currentUser._id.$oid + "/number_of_notes", { headers: AuthHeader() })
+        .catch((error) => {
+          console.error("Error retrieving user data:", error);
+        });
+      setNumber_of_notes(response.data.number_of_notes);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+  
+  const fetchCollectionData = async () => {
+    try {
+      const response = await axios.get(API_URL + currentUser._id.$oid + "/number_of_collections", { headers: AuthHeader() })
+        .catch((error) => {
+          console.error("Error retrieving user data:", error);
+        });
+      setNumber_of_collections(response.data.number_of_collections);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
 
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -176,6 +209,7 @@ const UserProfile = () => {
 
   return (
     <Container>
+      <FriendsSidebar />
       <Row className="mt-4">
         <Col md={6}>
           <Card>
@@ -266,14 +300,13 @@ const UserProfile = () => {
           </Card.Header>
           <Card.Body>
             <Row>
-              <Col>
+              <Col className="d-flex flex-column align-items-center justify-content-center">
                 <p><strong>Usuario desde</strong> {user ? formatDate(user.created_at) : 'Cargando...'}</p>
-                <p style={{marginTop: '50px'}}><strong>Nº de notas:</strong> {user ? user.notesCount : 'Cargando...'}</p>
+                <p style={{marginTop: '50px'}}><strong>Nº de notas:</strong> {number_of_notes ? number_of_notes : 'Cargando...'}</p>
               </Col>
-              <Col>
-              <UserRole isAdmin={user ? user.admin : false} />
-
-                <p style={{marginTop: '50px'}} ><strong>Nº de colecciones:</strong> {user ? user.collectionsCount : 'Cargando...'}</p>
+              <Col className="d-flex flex-column align-items-center justify-content-center">
+                <UserRole isAdmin={user ? user.admin : false} />
+                <p style={{marginTop: '50px'}} ><strong>Nº de colecciones:</strong> {number_of_collections ? number_of_collections : 'Cargando...'}</p>
               </Col>
             </Row>
           </Card.Body>

@@ -56,6 +56,7 @@ function NavBar() {
                   height="40"
                   className="rounded-circle"
                   alt="User profile"
+                  zIndex="1000"
                 />
               }
               id="navbarDropdownMenuLink"

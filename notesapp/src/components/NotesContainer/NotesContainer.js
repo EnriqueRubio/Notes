@@ -4,16 +4,19 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import "./notesContainer.css";
+import ShareNoteModal from './ShareNoteModal';
 import { Toast } from 'bootstrap'
-import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
+import { Button, Dropdown } from 'react-bootstrap';
 import { FaPlus } from 'react-icons/fa';
 import { BiListPlus, BiShareAlt, BiEdit, BiTrash } from 'react-icons/bi';
 import AuthService from '../../services/auth.service';
 import AuthHeader from "../../services/auth-header";
 import FriendsSidebar from '../FriendsSidebar/FriendsSidebar';
 
-const API_URL_NOTES = "http://localhost:3000/api/notes";
-const API_URL_COLLECTIONS = "http://localhost:3000/api/collections";
+const BASE_API_URL = "http://localhost:3000/api/";
+const API_URL_NOTES = BASE_API_URL + "notes";
+const API_URL_COLLECTIONS = BASE_API_URL + "collections";
+const API_URL_FRIENDS = BASE_API_URL + 'friends/only_accepted';
 
 let estado = 0;
 let titulo_estado;
@@ -124,6 +127,10 @@ const NoteContainer = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notes, setNotes] = useState([]);
   const [collections, setCollections] = useState([]);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [noteToShare, setNoteToShare] = useState(null);
+  const [friends, setFriends] = useState([]);
+  const [sharedFriends, setSharedFriends] = useState([]);
   const navigate = useNavigate();
 
   const reloadData = async () => {
@@ -152,8 +159,6 @@ const NoteContainer = () => {
   }, [navigate]);
 
   useEffect(() => {
-    // Llama a la función fetchCollections para obtener la lista de colecciones
-    // y actualiza el estado 'collections' cuando el componente se monta
     try {
       axios.get(API_URL_COLLECTIONS, { headers: AuthHeader() }).then(response => {
         setCollections(response.data);
@@ -165,6 +170,51 @@ const NoteContainer = () => {
       console.error('Error fetching friends data:', error);
     }
   }, []);
+
+  useEffect(() => {
+    try {
+      axios.get(API_URL_FRIENDS, { headers: AuthHeader() }).then(response => {
+        let friendUsers = [];
+        response.data.forEach(relationship => {
+          friendUsers.push(relationship.user);
+        });
+        setFriends(friendUsers);
+          })
+          .catch(error => {
+          console.log(error);
+          });
+      } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }, []);
+
+  const handleShareModal = (note) => {
+    if (note.shared_to_ids) {
+      const shared = friends.filter((friend) => note.shared_to_ids.some(sharedId => sharedId.$oid === friend._id.$oid));
+      setSharedFriends(shared);
+    }
+    setNoteToShare(note);
+    setShowShareModal(true);
+  }
+  
+  // Función para mostrar el modal de compartir
+  const updateSharedNote = (updatedSharedFriends) => {
+    try {
+      axios.put(API_URL_NOTES + "/" + noteToShare._id.$oid + "/update_shared",
+      {
+        'shared_to': updatedSharedFriends.map(friend => friend._id)
+      },
+      { headers: AuthHeader() })
+      .then(response => {
+        noteToShare.shared_to_ids = updatedSharedFriends.map(friend => friend._id);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+  }
 
   const handlerEditNote = function () {
 
@@ -331,14 +381,14 @@ const NoteContainer = () => {
               <div class="modal-header">
                 <h1 class="modal-title fs-5" id="createModalLabel">
                   Título:
-                  <input id="createNoteTitle" type="text" defaultValue="" />
+                  <input id="createNoteTitle" type="text" defaultValue="" placeholder='Titulo' />
                 </h1>
 
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
 
               <div class="modal-body">
-                <textarea id="createNoteContent" defaultValue="" rows="4" cols="60" />
+                <textarea id="createNoteContent" defaultValue="" placeholder="Contenido de la nota" rows="4" cols="60" />
               </div>
 
               <div id="validacionCrear" style={{ display: "none" }} class="alert alert-warning" role="alert">
@@ -390,8 +440,8 @@ const NoteContainer = () => {
                   </Dropdown>
                 </div>
 
-                <div class="class-icon" >
-                    <BiShareAlt size="1.5rem" />
+                <div class="class-icon" onClick={() => handleShareModal(note)} >
+                    <BiShareAlt size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#shareModal" cursor="pointer" />
                 </div>
 
                 <div class="class-icon" onClick={cargarModalActu}>
@@ -488,6 +538,15 @@ const NoteContainer = () => {
         );
 
       })}
+      {/* Modal para compartir la nota*/}
+  
+      <ShareNoteModal
+        show={showShareModal}
+        onHide={() => setShowShareModal(false)}
+        friends={friends}
+        sharedFriends={sharedFriends}
+        updateSharedNote={updateSharedNote}
+      />
 
     </div>
     <Button className="floating-button" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#createModal" onClick={limpiarCrear}>
