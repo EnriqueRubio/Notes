@@ -101,7 +101,6 @@ def update_shared
   end
 end
 
-
   # Put /notes/:id/share
   def share
     @note.shared_to << params[:user_id]
@@ -133,6 +132,6 @@ end
 
   # Only allow a list of trusted parameters through.
   def note_params
-    params.require(:note).permit(:title, :creation_date, :attachments, :avatar, content: {})
+    params.require(:note).permit(:title, :attachments, :avatar, content: {})
   end  
 end

@@ -39,6 +39,7 @@ Rails.application.routes.draw do
     end
     get '/collections/shared_with_me', to: 'collections#shared_with_me'
     get '/collections/shared_to/:user_id', to: 'collections#shared_to'
+    put '/collections/:id/update_shared', to: 'collections#update_shared'
     put '/collections/:id/share', to: 'collections#share', as: 'share_collection'
     put '/collections/:id/unshare', to: 'collections#unshare', as: 'unshare_collection'
 

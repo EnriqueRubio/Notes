@@ -34,3 +34,7 @@
   .custom-center {
     margin: 0 auto;
   }
+
+  .dropdown-menu {
+    z-index: 1000;
+  }

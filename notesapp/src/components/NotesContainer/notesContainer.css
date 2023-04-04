@@ -6,7 +6,7 @@
 
 .card:hover {
 	transform: scale(1.15);
-	z-index: 1000;
+	z-index: 999;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 
 }
@@ -27,6 +27,8 @@
 	opacity: 0;
 	overflow: hidden;
 	transition: all 0.3s ease;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
 }
   
 .card-expand-content {

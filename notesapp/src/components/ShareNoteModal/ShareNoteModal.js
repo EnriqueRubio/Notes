@@ -4,7 +4,7 @@ import './ShareNoteModal.css';
 
 const API_URL = "http://localhost:3000"
 
-const ShareNoteModal = ({ show, onHide, friends, sharedFriends, updateSharedNote }) => {
+const ShareNoteModal = ({ show, onHide, friends, sharedFriends, updateSharedItem, itemType }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [localFriends, setLocalFriends] = useState(friends);
     const [localSharedFriends, setLocalSharedFriends] = useState(sharedFriends);
@@ -20,14 +20,14 @@ const ShareNoteModal = ({ show, onHide, friends, sharedFriends, updateSharedNote
   
 
     const handleAccept = () => {
-        updateSharedNote(localSharedFriends);
+        updateSharedItem(localSharedFriends);
         onHide();
     };
 
     return (
         <Modal show={show} onHide={onHide} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Compartir nota</Modal.Title>
+                <Modal.Title>Compartir {itemType}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form.Control

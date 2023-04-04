@@ -4,7 +4,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import "./notesContainer.css";
-import ShareNoteModal from './ShareNoteModal';
+import ShareNoteModal from '../ShareNoteModal/ShareNoteModal';
 import { Toast } from 'bootstrap'
 import { Button, Dropdown } from 'react-bootstrap';
 import { FaPlus } from 'react-icons/fa';
@@ -12,6 +12,7 @@ import { BiListPlus, BiShareAlt, BiEdit, BiTrash } from 'react-icons/bi';
 import AuthService from '../../services/auth.service';
 import AuthHeader from "../../services/auth-header";
 import FriendsSidebar from '../FriendsSidebar/FriendsSidebar';
+import Toolbar from '../Toolbar/toolbar.component';
 import QuillEditor from '../Editor/editor.component';
 import { QuillDeltaToHtmlConverter } from 'quill-delta-to-html';
 
@@ -102,6 +103,14 @@ const NoteContainer = () => {
   const [currentViewingNote, setCurrentViewingNote] = useState('');
   const [currentEditingNote, setCurrentEditingNote] = useState('');
   const [currentDeletingNote, setCurrentDeletingNote] = useState('');
+  // Filtering and sorting states
+  const [filteredNotes, setFilteredNotes] = useState([]); 
+  const [selectedCollection, setSelectedCollection] = useState(null);
+  const [selectedFriend, setSelectedFriend] = useState(null);
+  const [selectedDate, setSelectedDate] = useState('ever');
+  const [sortCriteria, setSortCriteria] = useState('created');
+  const [sortAscending, setSortAscending] = useState(true);
+  
   const navigate = useNavigate();
 
   const handleCreatorReady = (quill) => {
@@ -160,6 +169,7 @@ const NoteContainer = () => {
           }
         });
         setNotes(notes);
+        setFilteredNotes(notes);
         //setNotes(response.data);
       })
         .catch(error => {
@@ -391,6 +401,92 @@ const NoteContainer = () => {
     </span>
   ));
 
+  // Filtering and sorting functions
+
+  const applyFilters = () => {
+    let filteredNotes = notes;
+  
+    if (selectedCollection !== null) {
+      // Aplica el filtro de colección
+      filteredNotes = filteredNotes.filter((note) => {
+        if(note.parent_collection_id) {
+          return note.parent_collection_id.$oid === selectedCollection._id.$oid;
+        }
+        console.log(note.parent_collection_id);
+        console.log(selectedCollection._id);
+        
+      });
+    }
+    
+    if (selectedFriend !== null) {
+      // Aplica el filtro de amigos
+      filteredNotes = filteredNotes.filter((note) => {
+        return note.shared_to_ids.some((idObj) => idObj.$oid === selectedFriend._id.$oid);
+      });
+    }    
+  
+    if (selectedDate !== null) {
+      // Aplica el filtro de fecha
+      const now = new Date();
+      filteredNotes = filteredNotes.filter((note) => {
+        const createdAt = new Date(note.created_at);
+        const timeDiff = now - createdAt;
+
+        switch (selectedDate) {
+          case 'recently':
+            return timeDiff <= 60 * 60 * 1000; // Menos de una hora
+          case 'today':
+            return timeDiff <= 24 * 60 * 60 * 1000; // Menos de un día
+          case 'this_week':
+            return timeDiff <= 7 * 24 * 60 * 60 * 1000; // Menos de una semana
+          case 'this_month':
+            return timeDiff <= 30 * 24 * 60 * 60 * 1000; // Menos de un mes
+          case 'this_year':
+            return timeDiff <= 365 * 24 * 60 * 60 * 1000; // Menos de un año
+          case 'older':
+            return timeDiff > 365 * 24 * 60 * 60 * 1000; // Más de un año
+          default:
+            return true;
+        }
+      });
+    }
+  
+    setFilteredNotes(filteredNotes);
+  };
+  
+  const sortNotes = () => {
+    const sortedNotes = [...filteredNotes];
+  
+    sortedNotes.sort((a, b) => {
+      let comparison = 0;
+  
+      // Ordena según el criterio seleccionado
+      switch (sortCriteria) {
+        case "title":
+          comparison = a.title.localeCompare(b.title);
+          break;
+        case "created":
+          comparison = new Date(a.created_at) - new Date(b.created_at);
+          break;
+        case "modified":
+          comparison = new Date(a.updated_at) - new Date(b.updated_at);
+          break;
+        default:
+          break;
+      }
+  
+      return sortAscending ? comparison : -comparison;
+    });
+    setFilteredNotes(sortedNotes);
+  };
+
+  useEffect (() => {
+    applyFilters();
+  }, [selectedCollection, selectedFriend, selectedDate]);
+
+  useEffect (() => {
+    sortNotes();
+  }, [sortCriteria, sortAscending]);
 
   return (
     <>
@@ -407,6 +503,23 @@ const NoteContainer = () => {
             </div>
           </div>
           <FriendsSidebar />
+
+          <Toolbar
+            setSelectedCollection={setSelectedCollection}
+            setSelectedFriend={setSelectedFriend}
+            setSelectedDate={setSelectedDate}
+            setSortCriteria={setSortCriteria}
+            setSortAscending={setSortAscending}
+            sortAscending={sortAscending}
+            friends={friends}
+            collections={collections}
+            sortCriteria={sortCriteria}
+            selectedDate={selectedDate}
+            selectedFriend={selectedFriend}
+            selectedCollection={selectedCollection}
+          />
+
+
           <div class="card-deck">
 
             {/* Modal para crear la nota */}
@@ -444,25 +557,23 @@ const NoteContainer = () => {
               </div>
             </div>
 
-            {notes.map((note, i) => {
+            {filteredNotes.map((note, i) => {
               const bgColor = changeBackground();
               return (
 
 
-                  <div class="card" style={{ padding: "3px 3px 3px 3px", margin: "5px 5px 5px 5px", width: "18rem", height: "15rem", backgroundColor: bgColor }}>
+                  <div class="card" style={{ padding: "3px 3px 3px 3px", margin: "5px 5px 5px 5px", width: "18rem", height: "15rem", backgroundColor: bgColor, overflow: "visible" }}>
 
-                    <div class="card-body" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer' }} >
+                    <div class="card-body" style={{ flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer' }}  data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#showModal" id={i} onClick={() => cargarModalVer(note)} >
                       {/*<div data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#showModal" id={[i, note.title, note.content]} onMouseEnter={guardarEstado} onClick={cargarModalVer}>*/ }
-                      <div data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#showModal" id={i} onClick={() => cargarModalVer(note)} >
+
                         <h5 class="card-title"><strong>{note.title}</strong></h5>
 
                         <div class="card-text-preview scrollbar-primary" dangerouslySetInnerHTML={{ __html: note.contentPreview ? note.contentPreview : note.content }} />
 
-                      </div>
-
                     </div>
 
-                    <div class="card-expand">
+                    <div class="card-expand" style={{ overflow: "visible" }} >
                       <div class="card-expand-content">
                       {/* Aquí va el contenido adicional que deseas mostrar en la animación */}
                       <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -574,13 +685,14 @@ const NoteContainer = () => {
               onHide={() => setShowShareModal(false)}
               friends={friends}
               sharedFriends={sharedFriends}
-              updateSharedNote={updateSharedNote}
+              updateSharedItem={updateSharedNote}
+              itemType='nota'
             />
 
             {/* Modal para borrar la nota */}
 
             <div class="modal fade" id="deleteModal" aria-labelledby="deleteModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
+              <div class="custom-modal-dialog modal-dialog modal-dialog-centered">
                 <div class="modal-content">
 
                   <div class="modal-header">

@@ -1,8 +1,9 @@
 class Note
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   field :title, type: String
-  field :creation_date, type: Date
+  #field :creation_date, type: Date
   field :content, type: Hash
   field :attachments, type: Array
 

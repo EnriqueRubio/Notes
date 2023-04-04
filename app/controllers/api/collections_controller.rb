@@ -1,5 +1,5 @@
 class Api::CollectionsController < ApplicationController
-  before_action :set_collection, only: %i[ show update destroy add_note remove_note ]
+  before_action :set_collection, only: %i[ show update destroy add_note remove_note update_shared ]
   before_action :authenticate_api_user!
 
   # GET /collections
@@ -93,6 +93,26 @@ class Api::CollectionsController < ApplicationController
     @collections = Collection.where(author: current_api_user.id, shared_to: params[:user_id])
     render json: @collections
   end
+
+# Put /collections/:id/update_shared
+def update_shared
+  puts("LA COLECCIÓN: #{@collection}")
+  puts("PARAMS: #{params[:shared_to]}")
+  # Convierte los elementos de la lista en objetos apropiados
+  shared_to_ids = params[:shared_to].map { |friend| friend["$oid"] }
+
+  # Busca los objetos User a partir de los IDs
+  shared_to_users = User.find(shared_to_ids)
+
+  # Asigna los objetos User a la lista shared_to de la nota
+  @collection.shared_to = shared_to_users
+  if @collection.save
+    render json: { message: 'Collection successfully updated' }, status: :ok
+  else
+    puts "Error saving collection: #{@collection.errors.full_messages}"
+    render json: { errors: @collection.errors.full_messages }, status: :unprocessable_entity
+  end
+end
 
   # Put /collections/:id/share
   def share
