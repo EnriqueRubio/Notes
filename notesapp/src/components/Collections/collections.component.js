@@ -23,6 +23,7 @@ import { Toast } from 'bootstrap'
 import AuthService from '../../services/auth.service';
 import AuthHeader from "../../services/auth-header";
 import FriendsSidebar from '../FriendsSidebar/FriendsSidebar';
+import QuillEditor from '../Editor/editor.component';
 
 const API_URL_COLLECTIONS = "http://localhost:3000/api/collections/";
 const API_URL_NOTES = "http://localhost:3000/api/notes/";
@@ -45,6 +46,19 @@ const Collections = () => {
     const [selectedNote, setSelectedNote] = useState(null);
     const [showNoteModal, setShowNoteModal] = useState(false);
     const [isMouseOverRemoveIcon, setIsMouseOverRemoveIcon] = useState(false);
+
+    const [quillInstance, setQuillInstance] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [currentEditingNote, setCurrentEditingNote] = useState('');
+    
+    const handleEditorReady = (quill) => {
+        setQuillInstance(quill);
+    };
+    
+      const getCurrentEditingNoteContent = () => {
+        return currentEditingNote.content;
+    }; 
+
     const predefinedThemes = [
         {
             bgColor: '#ebffdb',
@@ -270,6 +284,8 @@ const Collections = () => {
       
     // NOTE HANDLING
     const handleNoteClick = (note) => {
+        setCurrentEditingNote(note);
+        setIsEditModalOpen(true);
         setSelectedNote(note);
         setShowNoteModal(true);
     };
@@ -369,7 +385,7 @@ const Collections = () => {
             {
             "note": {
                 title: noteTitle? noteTitle : note.title,
-                content: noteContent? noteContent : note.content
+                content: noteContent? noteContent : quillInstance.editor.delta
             },
             },
             {
@@ -573,7 +589,7 @@ const Collections = () => {
                     </Modal.Footer>
                 </Modal>
 
-                <Modal show={showNoteModal} onHide={() => setShowNoteModal(false)} centered>
+                <Modal dialogClassName="custom-modal-dialog" show={showNoteModal} onHide={() => setShowNoteModal(false)} centered>
                     <Modal.Header closeButton>
                         <Modal.Title>Editar nota</Modal.Title>
                     </Modal.Header>
@@ -591,14 +607,21 @@ const Collections = () => {
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Contenido</Form.Label>
+                            <QuillEditor
+                                onEditorReady={handleEditorReady}
+                                getCurrentContent={getCurrentEditingNoteContent}
+                            />
+                        {/*
                             <Form.Control
+                            className="scrollbar-primary"
                             as="textarea"
-                            rows={3}
+                            rows={20}
                             id="noteContent"
                             placeholder="Contenido de la nota"
                             defaultValue={selectedNote?.content || ''}
                             onChange={handleNoteInputChange('noteContent')}
                             />
+                        */}
                         </Form.Group>
                         </Form>
                     </Modal.Body>

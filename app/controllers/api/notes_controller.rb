@@ -133,6 +133,6 @@ end
 
   # Only allow a list of trusted parameters through.
   def note_params
-    params.require(:note).permit(:title, :creation_date, :content, :attachments, :avatar)
-  end
+    params.require(:note).permit(:title, :creation_date, :attachments, :avatar, content: {})
+  end  
 end

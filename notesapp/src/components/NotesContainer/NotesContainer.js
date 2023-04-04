@@ -12,6 +12,8 @@ import { BiListPlus, BiShareAlt, BiEdit, BiTrash } from 'react-icons/bi';
 import AuthService from '../../services/auth.service';
 import AuthHeader from "../../services/auth-header";
 import FriendsSidebar from '../FriendsSidebar/FriendsSidebar';
+import QuillEditor from '../Editor/editor.component';
+import { QuillDeltaToHtmlConverter } from 'quill-delta-to-html';
 
 const BASE_API_URL = "http://localhost:3000/api/";
 const API_URL_NOTES = BASE_API_URL + "notes";
@@ -21,7 +23,6 @@ const API_URL_FRIENDS = BASE_API_URL + 'friends/only_accepted';
 let estado = 0;
 let titulo_estado;
 let contenido_estado;
-let note_data;
 
 let notification_title;
 let notification_content;
@@ -44,43 +45,6 @@ function formatoFecha(fecha, formato) {
   }
 
   return formato.replace(/dd|mm|yy|yyy/gi, matched => map[matched])
-}
-
-function guardarEstado(e) {
-
-  const array_estado = e.currentTarget.id.split(",");
-  estado = array_estado[0];
-  titulo_estado = array_estado[1];
-  contenido_estado = array_estado[2];
-}
-
-function cargarModalVer() {
-  const title_n = document.getElementById("showNoteTitle");
-  const content_n = document.getElementById("showNoteContent");
-  title_n.innerHTML = titulo_estado;
-  content_n.innerHTML = contenido_estado;
-}
-
-function cargarModalActu() {
-  reinicioValidaciones();
-  const title_n = document.getElementById("updateNoteTitle");
-  const content_n = document.getElementById("updateNoteContent");
-  title_n.value = titulo_estado;
-  content_n.value = contenido_estado;
-}
-
-function limpiarCrear() {
-  reinicioValidaciones();
-  const createNoteTitle = document.getElementById('createNoteTitle');
-  const createNoteContent = document.getElementById('createNoteContent');
-
-  if (createNoteTitle) {
-    createNoteTitle.value ="";
-  }
-
-  if (createNoteContent) {
-    createNoteContent.value ="";
-  }
 }
 
 function reinicioValidaciones() {
@@ -131,14 +95,73 @@ const NoteContainer = () => {
   const [noteToShare, setNoteToShare] = useState(null);
   const [friends, setFriends] = useState([]);
   const [sharedFriends, setSharedFriends] = useState([]);
+  const [quillCreateNoteInstance, setQuillCreateNoteInstance] = useState(null);
+  const [quillInstance, setQuillInstance] = useState(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentViewingNote, setCurrentViewingNote] = useState('');
+  const [currentEditingNote, setCurrentEditingNote] = useState('');
+  const [currentDeletingNote, setCurrentDeletingNote] = useState('');
   const navigate = useNavigate();
+
+  const handleCreatorReady = (quill) => {
+    setQuillCreateNoteInstance(quill);
+  };
+
+  const handleEditorReady = (quill) => {
+    setQuillInstance(quill);
+  };
+
+  const getCurrentEditingNoteContent = () => {
+    return currentEditingNote.content;
+  };  
+
+  const cargarModalVer = (note) => {
+    setCurrentViewingNote(note);
+    setIsViewModalOpen(true);
+    const title_n = document.getElementById("viewNoteTitle");
+    const content_n = document.getElementById("viewNoteContent");
+    title_n.innerHTML = note.title;
+    if(typeof note.content === 'object') {
+      content_n.innerHTML=note.contentPreview;
+    } else content_n.innerHTML = note.content;
+    //content_n.value = contenido_estado;
+  }
+
+  const cargarModalActu = (note) => {
+    setCurrentEditingNote(note);
+    setIsEditModalOpen(true);
+    reinicioValidaciones();
+    const title_n = document.getElementById("updateNoteTitle");
+    //const content_n = document.getElementById("updateNoteContent");
+    title_n.value = note.title;
+    //content_n.value = contenido_estado;
+  }
+
+  const cargarModalDelete = (note) => {
+    setCurrentDeletingNote(note);
+  }
 
   const reloadData = async () => {
     try {
       axios.get(API_URL_NOTES, { headers: AuthHeader() }).then(response => {
-          note_data = response.data;
-          setNotes(response.data);
-        })
+        
+        const notes = response.data.map(note => {
+          // Si el contenido de la nota es un objeto Delta, lo convertimos a HTML
+          if (typeof note.content === 'object' && note.content.ops) {
+            const converter = new QuillDeltaToHtmlConverter(note.content.ops, {});
+            const noteHTML = converter.convert();
+        
+            // Creamos una nueva nota con el contenido convertido a HTML
+            return { ...note, contentPreview: noteHTML };
+          } else {
+            // Si el contenido de la nota no es un objeto Delta, lo mantenemos sin cambios
+            return note;
+          }
+        });
+        setNotes(notes);
+        //setNotes(response.data);
+      })
         .catch(error => {
           console.log(error);
         });
@@ -149,29 +172,27 @@ const NoteContainer = () => {
 
   useEffect(() => {
     const user = AuthService.getCurrentUser();
-    
+
     if (user) {
       setIsLoggedIn(true);
     } else {
       navigate('/login');
     }
     reloadData();
-  }, [navigate]);
 
-  useEffect(() => {
+    // Cargamos las colecciones
     try {
       axios.get(API_URL_COLLECTIONS, { headers: AuthHeader() }).then(response => {
         setCollections(response.data);
-        })
+      })
         .catch(error => {
           console.log(error);
         });
     } catch (error) {
       console.error('Error fetching friends data:', error);
     }
-  }, []);
 
-  useEffect(() => {
+    // Cargamos los amigos
     try {
       axios.get(API_URL_FRIENDS, { headers: AuthHeader() }).then(response => {
         let friendUsers = [];
@@ -179,14 +200,14 @@ const NoteContainer = () => {
           friendUsers.push(relationship.user);
         });
         setFriends(friendUsers);
-          })
-          .catch(error => {
+      })
+        .catch(error => {
           console.log(error);
-          });
-      } catch (error) {
+        });
+    } catch (error) {
       console.error('Error fetching data:', error);
     }
-  }, []);
+  }, [navigate]);
 
   const handleShareModal = (note) => {
     if (note.shared_to_ids) {
@@ -196,45 +217,48 @@ const NoteContainer = () => {
     setNoteToShare(note);
     setShowShareModal(true);
   }
-  
+
   // Función para mostrar el modal de compartir
   const updateSharedNote = (updatedSharedFriends) => {
     try {
       axios.put(API_URL_NOTES + "/" + noteToShare._id.$oid + "/update_shared",
-      {
-        'shared_to': updatedSharedFriends.map(friend => friend._id)
-      },
-      { headers: AuthHeader() })
-      .then(response => {
-        noteToShare.shared_to_ids = updatedSharedFriends.map(friend => friend._id);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-      } catch (error) {
-        console.error('Error fetching data:', error);
+        {
+          'shared_to': updatedSharedFriends.map(friend => friend._id)
+        },
+        { headers: AuthHeader() })
+        .then(response => {
+          noteToShare.shared_to_ids = updatedSharedFriends.map(friend => friend._id);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    } catch (error) {
+      console.error('Error fetching data:', error);
     }
   }
 
   const handlerEditNote = function () {
-
     let new_title = document.getElementById('updateNoteTitle').value;
-    let new_content = document.getElementById('updateNoteContent').value;
+    //let quillEditor = document.getElementById('quill-editor');
+    //let new_content = quillInstance.getHTML();
+    let new_content = quillInstance.editor.delta;
     let note_id;
 
     if (new_title === "" || new_content === "") {
       document.getElementById('validacionEdit').style.display = "block";
     } else {
-
+      note_id = currentEditingNote._id.$oid;
+      setCurrentEditingNote('');
+/*
       for (var element in note_data) {
         if (element === estado) {
           note_id = note_data[element]._id.$oid;
         }
 
-      }
+      }*/
 
       //Actualizamos
-      axios.put(`${API_URL_NOTES}/${note_id}`, 
+      axios.put(`${API_URL_NOTES}/${note_id}`,
         {
           "note": {
             "title": new_title,
@@ -249,13 +273,28 @@ const NoteContainer = () => {
           }
         }
       )
-      .then(() => {
+        .then(() => {
           document.getElementById("btnUpdateClose").click();
           reloadData();
           notification(2);
         });
     }
+  }
 
+  function limpiarCrear() {
+    setCurrentEditingNote('');
+    setIsEditModalOpen(true);
+    reinicioValidaciones();
+    const createNoteTitle = document.getElementById('createNoteTitle');
+    const createNoteContent = document.getElementById('createNoteContent');
+  
+    if (createNoteTitle) {
+      createNoteTitle.value = "";
+    }
+  
+    if (createNoteContent) {
+      createNoteContent.value = "";
+    }
   }
 
   const handlerCreateNote = function () {
@@ -263,17 +302,16 @@ const NoteContainer = () => {
     const fecha_actual = new Date();
     let creation_date = formatoFecha(fecha_actual, 'yy-mm-dd');
     let create_title = document.getElementById('createNoteTitle').value;
-    let create_content = document.getElementById('createNoteContent').value;
+    let create_content = quillCreateNoteInstance.editor.delta;
 
     if (create_title === "" || create_content === "") {
       document.getElementById('validacionCrear').style.display = "block";
     } else {
       //Creamos
-      axios.post(`${API_URL_NOTES}`, 
+      axios.post(`${API_URL_NOTES}`,
         {
           "note": {
             "title": create_title,
-            "creation_date": creation_date,
             "content": create_content
           }
         },
@@ -285,7 +323,7 @@ const NoteContainer = () => {
           }
         }
       )
-      .then(() => {
+        .then(() => {
           document.getElementById("btnCreateClose").click();
           reloadData();
           document.getElementById('createNoteTitle').value = "";
@@ -297,14 +335,14 @@ const NoteContainer = () => {
   }
 
   const handlerDeleteNote = function () {
-    let note_id;
-
+    let note_id = currentDeletingNote._id.$oid;
+    /*
     for (var element in note_data) {
       if (element === estado) {
         note_id = note_data[element]._id.$oid;
       }
 
-    }
+    }*/
     //Borramos
     axios.delete(`${API_URL_NOTES}/${note_id}`,
       {
@@ -322,25 +360,25 @@ const NoteContainer = () => {
       });
 
   }
-  
+
   async function addNoteToCollection(collectionId, noteId) {
-    axios.post(`${API_URL_COLLECTIONS}/${collectionId}/add_note`, 
-    {
-      "note_id": noteId
-    },
-    {
-      headers: {
-        ...AuthHeader(),
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+    axios.post(`${API_URL_COLLECTIONS}/${collectionId}/add_note`,
+      {
+        "note_id": noteId
+      },
+      {
+        headers: {
+          ...AuthHeader(),
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
       }
-    }
-  )
-  .then(() => {
-      // Mostrar mensaje de éxito y marcar la colección como seleccionada
-    });
+    )
+      .then(() => {
+        // Mostrar mensaje de éxito y marcar la colección como seleccionada
+      });
   }
-  
+
   const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
     <span
       ref={ref}
@@ -352,207 +390,220 @@ const NoteContainer = () => {
       {children}
     </span>
   ));
-  
+
 
   return (
     <>
       {isLoggedIn ? (
-    <div>
-
-    <div id="toast" role="alert" style={{ position: "absolute", top: 0, right: 0 }} aria-live="assertive"
-      aria-atomic="true" class="toast" >
-      <div class="toast-header">
-        <strong class="me-auto">{notification_title}</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body">
-        {notification_content}
-      </div>
-    </div>
-    <FriendsSidebar />
-    <div class="card-deck">
-
-      {/* Modal para crear la nota */}
-
-        <div class="modal fade" id="createModal" aria-labelledby="createModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-
-              <div class="modal-header">
-                <h1 class="modal-title fs-5" id="createModalLabel">
-                  Título:
-                  <input id="createNoteTitle" type="text" defaultValue="" placeholder='Titulo' />
-                </h1>
-
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-
-              <div class="modal-body">
-                <textarea id="createNoteContent" defaultValue="" placeholder="Contenido de la nota" rows="4" cols="60" />
-              </div>
-
-              <div id="validacionCrear" style={{ display: "none" }} class="alert alert-warning" role="alert">
-                Debes rellenar todos los campos.
-              </div>
-
-              <div class="modal-footer">
-                <button id="btnCreateClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-outline-success" onClick={handlerCreateNote}>Crear Nota</button>
-              </div>
-
+        <div>
+          <div id="toast" role="alert" style={{ position: "absolute", top: 0, right: 0 }} aria-live="assertive"
+            aria-atomic="true" class="toast" >
+            <div class="toast-header">
+              <strong class="me-auto">{notification_title}</strong>
+              <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+              {notification_content}
             </div>
           </div>
+          <FriendsSidebar />
+          <div class="card-deck">
+
+            {/* Modal para crear la nota */}
+
+            <div class="modal fade" id="createModal" aria-labelledby="createModalLabel" aria-hidden="true">
+              <div class="modal-dialog custom-modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="createModalLabel">
+                      Título:
+                      <input id="createNoteTitle" type="text" defaultValue="" placeholder='Titulo' style={{ marginLeft: "5px", borderTop: "none", borderLeft: "none", borderRight: "none", width: "400px" }} />
+                    </h1>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+
+                  <div class="modal-body">
+                    <QuillEditor
+                      onEditorReady={handleCreatorReady}
+                      getCurrentContent={getCurrentEditingNoteContent}
+                    />
+                  </div>
+
+                  <div id="validacionCrear" style={{ display: "none" }} class="alert alert-warning" role="alert">
+                    Debes rellenar todos los campos.
+                  </div>
+
+                  <div class="modal-footer">
+                    <button id="btnCreateClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-outline-success" onClick={handlerCreateNote}>Crear Nota</button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            {notes.map((note, i) => {
+              const bgColor = changeBackground();
+              return (
+
+
+                  <div class="card" style={{ padding: "3px 3px 3px 3px", margin: "5px 5px 5px 5px", width: "18rem", height: "15rem", backgroundColor: bgColor }}>
+
+                    <div class="card-body" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer' }} >
+                      {/*<div data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#showModal" id={[i, note.title, note.content]} onMouseEnter={guardarEstado} onClick={cargarModalVer}>*/ }
+                      <div data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#showModal" id={i} onClick={() => cargarModalVer(note)} >
+                        <h5 class="card-title"><strong>{note.title}</strong></h5>
+
+                        <div class="card-text-preview scrollbar-primary" dangerouslySetInnerHTML={{ __html: note.contentPreview ? note.contentPreview : note.content }} />
+
+                      </div>
+
+                    </div>
+
+                    <div class="card-expand">
+                      <div class="card-expand-content">
+                      {/* Aquí va el contenido adicional que deseas mostrar en la animación */}
+                      <div style={{ display: 'flex', justifyContent: 'center' }}>
+                      <div className="class-icons" id={[i, note.title]}>
+
+                        <div class="class-icon">
+                          <Dropdown>
+                            <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components">
+                              <BiListPlus className="custom-note-icon" size="1.7rem" cursor="pointer" />
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              {collections.map((collection) => (
+                                <Dropdown.Item
+                                  key={collection._id.$oid}
+                                  onClick={() => addNoteToCollection(collection._id.$oid, note._id.$oid)}
+                                >
+                                  {collection.title}
+                                </Dropdown.Item>
+                              ))}
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </div>
+
+                        <div class="class-icon" >
+                          <BiShareAlt className="custom-note-icon" onClick={() => handleShareModal(note)} size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#shareModal" cursor="pointer" />
+                        </div>
+
+                        <div class="class-icon">
+                          <BiEdit className="custom-note-icon" onClick={() => cargarModalActu(note)} size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#editModal" cursor="pointer" />
+                        </div>
+
+                        <div class="class-icon">
+                          <BiTrash className="custom-note-icon" onClick={() => cargarModalDelete(note)} size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#deleteModal" cursor="pointer" />
+                        </div>
+
+                      </div>
+                      </div>
+                      </div>
+                    </div>
+                  </div>
+
+              );
+
+            })}
+
+            {/* Modal para ver la nota */}
+
+            <div class="modal fade" id="showModal" aria-labelledby="showModalLabel" aria-hidden="true">
+              <div class="custom-modal-dialog modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="viewNoteTitle" style={{ textAlign: "center", width: "100%" }} ></h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+
+                  <div class="modal-body card-text" id="viewNoteContent"></div>
+
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            {/* Modal para editar la nota */}
+
+            <div class="modal fade" id="editModal" aria-labelledby="editModalLabel" aria-hidden="true">
+              <div class="custom-modal-dialog modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="editModalLabel">
+                      Editar Nota:
+                      <input id="updateNoteTitle" type="text" defaultValue="test" style={{ marginLeft: "5px", borderTop: "none", borderLeft: "none", borderRight: "none", width: "400px" }} />
+                    </h1>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+
+                  <div class="modal-body">
+                    {/*<textarea id="updateNoteContent" defaultValue="test" rows="4" cols="60" />*/}
+                    <div>
+                    <QuillEditor
+                      onEditorReady={handleEditorReady}
+                      getCurrentContent={getCurrentEditingNoteContent}
+                    />
+                    </div>
+                  </div>
+
+                  <div id="validacionEdit" style={{ display: "none" }} class="alert alert-warning" role="alert">
+                    Debes rellenar todos los campos.
+                  </div>
+
+                  <div class="modal-footer">
+                    <button id="btnUpdateClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-outline-success" onClick={handlerEditNote}>Actualizar Nota</button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            {/* Modal para compartir la nota*/}
+
+            <ShareNoteModal
+              show={showShareModal}
+              onHide={() => setShowShareModal(false)}
+              friends={friends}
+              sharedFriends={sharedFriends}
+              updateSharedNote={updateSharedNote}
+            />
+
+            {/* Modal para borrar la nota */}
+
+            <div class="modal fade" id="deleteModal" aria-labelledby="deleteModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteNoteTitle">¡Cuidado!</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+
+                  <div class="modal-body" id="deleteNoteContent">Estas a punto de borrar tu nota, ¿Estás seguro de hacerlo?</div>
+
+                  <div class="modal-footer">
+                    <button id="btnDeleteClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" onClick={handlerDeleteNote}>Borrar Nota</button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <Button className="floating-button" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#createModal" onClick={limpiarCrear}>
+            <FaPlus />
+          </Button>
         </div>
-
-      {notes.map((note, i) => {
-        const bgColor = changeBackground();
-        return (
-
-
-          <div>
-            <div class="card" style={{ padding: "10px 20px 0px", margin: "5px 5px 5px 5px", width: "18rem", height: "15rem", backgroundColor: bgColor }}>
-
-              <div class="card-body" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }} >
-                <div data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#showModal" id={[i, note.title, note.content]} onMouseEnter={guardarEstado} onClick={cargarModalVer}>
-                  <h5 class="card-title"><strong>{note.title}</strong></h5>
-
-                  <p class="card-text"><strong>{note.content}</strong></p>
-
-                </div>
-
-                <div class="class-icons" id={[i, note.title, note.content]} onMouseEnter={guardarEstado}>
-
-                <div class="class-icon">
-                  <Dropdown>
-                    <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components">
-                      <BiListPlus size="1.7rem" cursor="pointer" />
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                      {collections.map((collection) => (
-                        <Dropdown.Item
-                          key={collection._id.$oid}
-                          onClick={() => addNoteToCollection(collection._id.$oid, note._id.$oid)}
-                        >
-                          {collection.title}
-                        </Dropdown.Item>
-                      ))}
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </div>
-
-                <div class="class-icon" onClick={() => handleShareModal(note)} >
-                    <BiShareAlt size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#shareModal" cursor="pointer" />
-                </div>
-
-                <div class="class-icon" onClick={cargarModalActu}>
-                  <BiEdit size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#editModal" cursor="pointer" />
-                </div>
-
-                <div class="class-icon">
-                  <BiTrash size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#deleteModal" cursor="pointer" />
-                </div>
-
-              </div>
-
-            </div>
-
-              {/* Modal para ver la nota */}
-
-              <div class="modal fade" id="showModal" aria-labelledby="showModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-
-                    <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="showNoteTitle">test</h1>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body" id="showNoteContent"></div>
-
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal para editar la nota */}
-
-              <div class="modal fade" id="editModal" aria-labelledby="editModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-
-                    <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="editModalLabel">
-                        Editar Nota:
-                        <input id="updateNoteTitle" type="text" defaultValue="test" />
-                      </h1>
-
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body">
-                      <textarea id="updateNoteContent" defaultValue="test" rows="4" cols="60" />
-                    </div>
-
-                    <div id="validacionEdit" style={{ display: "none" }} class="alert alert-warning" role="alert">
-                      Debes rellenar todos los campos.
-                    </div>
-
-                    <div class="modal-footer">
-                      <button id="btnUpdateClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-                      <button type="button" class="btn btn-outline-success" onClick={handlerEditNote}>Actualizar Nota</button>
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal para borrar la nota */}
-
-              <div class="modal fade" id="deleteModal" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-
-                    <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="deleteNoteTitle">¡Cuidado!</h1>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body" id="deleteNoteContent">Estas a punto de borrar tu nota, ¿Estás seguro de hacerlo?</div>
-
-                    <div class="modal-footer">
-                      <button id="btnDeleteClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                      <button type="button" class="btn btn-danger" onClick={handlerDeleteNote}>Borrar Nota</button>
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-
-        );
-
-      })}
-      {/* Modal para compartir la nota*/}
-  
-      <ShareNoteModal
-        show={showShareModal}
-        onHide={() => setShowShareModal(false)}
-        friends={friends}
-        sharedFriends={sharedFriends}
-        updateSharedNote={updateSharedNote}
-      />
-
-    </div>
-    <Button className="floating-button" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#createModal" onClick={limpiarCrear}>
-        <FaPlus />
-    </Button>
-  </div>
       ) : (
         // Renderiza un mensaje de error o redirecciona al usuario
         <h1>

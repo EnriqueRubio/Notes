@@ -67,6 +67,10 @@
   overflow-y: auto;
 }
 
+.custom-modal-dialog {
+  width: 50%;
+  max-width: 775px;
+}
 
 .scrollbar {
   margin-left: 5px;

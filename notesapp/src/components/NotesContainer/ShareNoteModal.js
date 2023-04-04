@@ -40,7 +40,7 @@ const ShareNoteModal = ({ show, onHide, friends, sharedFriends, updateSharedNote
                     <Col style={{ minWidth: '10rem', maxWidth: '15rem' }}>
                         <h5>Amigos</h5>
                         <div style={{ minHeight: '15rem', maxHeight: '25rem', overflowY: 'auto' }}>
-                            <ListGroup>
+                            <ListGroup className="scrollbar-primary">
                                 {filteredFriends.map((friend) => (
                                     <ListGroup.Item
                                         key={friend._id.$oid}
