@@ -1,6 +1,6 @@
 .toggle-sidebar {
   position: fixed;  /* Fija el botón en la ventana del navegador */
-  top: 115px;       /* Posiciona el botón a 300px del borde superior */
+  top: 200px;       /* Posiciona el botón a 300px del borde superior */
   right: 0;         /* Alinea el botón al borde derecho */
   z-index: 999;    /* Asegúrate de que el botón aparezca por encima del contenido */
   padding: 5px;    /* Agrega un poco de espacio alrededor del botón */

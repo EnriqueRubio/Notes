@@ -9,6 +9,7 @@ import { Toast } from 'bootstrap'
 import { Button, Dropdown } from 'react-bootstrap';
 import { FaPlus } from 'react-icons/fa';
 import { BiListPlus, BiShareAlt, BiEdit, BiTrash } from 'react-icons/bi';
+import { BsPersonFill } from 'react-icons/bs';
 import AuthService from '../../services/auth.service';
 import AuthHeader from "../../services/auth-header";
 import FriendsSidebar from '../FriendsSidebar/FriendsSidebar';
@@ -89,6 +90,7 @@ function notification(action) {
 }
 
 const NoteContainer = () => {
+  const currentUser = AuthService.getCurrentUser();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notes, setNotes] = useState([]);
   const [collections, setCollections] = useState([]);
@@ -104,13 +106,13 @@ const NoteContainer = () => {
   const [currentEditingNote, setCurrentEditingNote] = useState('');
   const [currentDeletingNote, setCurrentDeletingNote] = useState('');
   // Filtering and sorting states
-  const [filteredNotes, setFilteredNotes] = useState([]); 
-  const [selectedCollection, setSelectedCollection] = useState(null);
-  const [selectedFriend, setSelectedFriend] = useState(null);
+  const [filteredNotes, setFilteredNotes] = useState([]);
+  const [selectedCollections, setSelectedCollections] = useState([]);
+  const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectedDate, setSelectedDate] = useState('ever');
   const [sortCriteria, setSortCriteria] = useState('created');
   const [sortAscending, setSortAscending] = useState(true);
-  
+
   const navigate = useNavigate();
 
   const handleCreatorReady = (quill) => {
@@ -123,7 +125,7 @@ const NoteContainer = () => {
 
   const getCurrentEditingNoteContent = () => {
     return currentEditingNote.content;
-  };  
+  };
 
   const cargarModalVer = (note) => {
     setCurrentViewingNote(note);
@@ -131,8 +133,8 @@ const NoteContainer = () => {
     const title_n = document.getElementById("viewNoteTitle");
     const content_n = document.getElementById("viewNoteContent");
     title_n.innerHTML = note.title;
-    if(typeof note.content === 'object') {
-      content_n.innerHTML=note.contentPreview;
+    if (typeof note.content === 'object') {
+      content_n.innerHTML = note.contentPreview;
     } else content_n.innerHTML = note.content;
     //content_n.value = contenido_estado;
   }
@@ -154,13 +156,12 @@ const NoteContainer = () => {
   const reloadData = async () => {
     try {
       axios.get(API_URL_NOTES, { headers: AuthHeader() }).then(response => {
-        
         const notes = response.data.map(note => {
           // Si el contenido de la nota es un objeto Delta, lo convertimos a HTML
           if (typeof note.content === 'object' && note.content.ops) {
             const converter = new QuillDeltaToHtmlConverter(note.content.ops, {});
             const noteHTML = converter.convert();
-        
+
             // Creamos una nueva nota con el contenido convertido a HTML
             return { ...note, contentPreview: noteHTML };
           } else {
@@ -259,13 +260,13 @@ const NoteContainer = () => {
     } else {
       note_id = currentEditingNote._id.$oid;
       setCurrentEditingNote('');
-/*
-      for (var element in note_data) {
-        if (element === estado) {
-          note_id = note_data[element]._id.$oid;
-        }
-
-      }*/
+      /*
+            for (var element in note_data) {
+              if (element === estado) {
+                note_id = note_data[element]._id.$oid;
+              }
+      
+            }*/
 
       //Actualizamos
       axios.put(`${API_URL_NOTES}/${note_id}`,
@@ -297,11 +298,11 @@ const NoteContainer = () => {
     reinicioValidaciones();
     const createNoteTitle = document.getElementById('createNoteTitle');
     const createNoteContent = document.getElementById('createNoteContent');
-  
+
     if (createNoteTitle) {
       createNoteTitle.value = "";
     }
-  
+
     if (createNoteContent) {
       createNoteContent.value = "";
     }
@@ -371,22 +372,67 @@ const NoteContainer = () => {
 
   }
 
-  async function addNoteToCollection(collectionId, noteId) {
-    axios.post(`${API_URL_COLLECTIONS}/${collectionId}/add_note`,
-      {
-        "note_id": noteId
-      },
-      {
-        headers: {
-          ...AuthHeader(),
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+  const addNoteToCollection = (collectionId, note) => {
+    let collectionIndex = -1;
+    console.log(note);
+    if (note.parent_collection_ids) {
+      collectionIndex = note.parent_collection_ids.findIndex(
+        parentCollection => parentCollection.$oid === collectionId
+      );
+    }
+
+    console.log(collectionIndex);
+
+    if (collectionIndex !== -1) {
+      //note.parent_collections.splice(collectionIndex, 1);
+      axios.put(`${API_URL_COLLECTIONS}/${collectionId}/remove_note`,
+        {
+          "note_id": note._id.$oid
+        },
+        {
+          headers: {
+            ...AuthHeader(),
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
         }
-      }
-    )
-      .then(() => {
-        // Mostrar mensaje de éxito y marcar la colección como seleccionada
-      });
+      )
+        .then(() => {
+          // Mostrar mensaje de éxito y marcar la colección como seleccionada
+          const updatedNotes = filteredNotes.map((n) =>
+            n._id.$oid === note._id.$oid
+              ? { ...n, parent_collection_ids: n.parent_collection_ids.filter((idObj) => idObj.$oid !== collectionId) }
+              : n
+          );
+          setFilteredNotes(updatedNotes);
+          setNotes(updatedNotes);
+        });
+    } else {
+      //note.parent_collections.push({ $oid: collectionId });
+      axios.put(`${API_URL_COLLECTIONS}/${collectionId}/add_note`,
+        {
+          "note_id": note._id.$oid
+        },
+        {
+          headers: {
+            ...AuthHeader(),
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      )
+        .then(() => {
+          // Mostrar mensaje de éxito y marcar la colección como seleccionada
+          const updatedNotes = filteredNotes.map((n) =>
+            n._id.$oid === note._id.$oid
+              ? { ...n, parent_collection_ids: [...n.parent_collection_ids, { $oid: collectionId }] }
+              : n
+          );
+          setFilteredNotes(updatedNotes);
+          setNotes(updatedNotes);
+        });
+    }
+
   }
 
   const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
@@ -405,26 +451,31 @@ const NoteContainer = () => {
 
   const applyFilters = () => {
     let filteredNotes = notes;
-  
-    if (selectedCollection !== null) {
-      // Aplica el filtro de colección
-      filteredNotes = filteredNotes.filter((note) => {
-        if(note.parent_collection_id) {
-          return note.parent_collection_id.$oid === selectedCollection._id.$oid;
-        }
-        console.log(note.parent_collection_id);
-        console.log(selectedCollection._id);
-        
-      });
-    }
-    
-    if (selectedFriend !== null) {
+
+    if (selectedCollections.length > 0) {
       // Aplica el filtro de amigos
       filteredNotes = filteredNotes.filter((note) => {
-        return note.shared_to_ids.some((idObj) => idObj.$oid === selectedFriend._id.$oid);
+        return note.parent_collection_ids.some((idObj) =>
+          selectedCollections.some((collection) => collection._id.$oid === idObj.$oid)
+        );
       });
-    }    
-  
+    }
+
+    if (selectedFriends.length > 0) {
+      // Aplica el filtro de amigos
+      filteredNotes = filteredNotes.filter((note) => {
+        return (
+          // Notas compartidas por el usuario actual con amigos seleccionados
+          note.shared_to_ids.some((idObj) =>
+            selectedFriends.some((friend) => friend._id.$oid === idObj.$oid)
+          ) ||
+          // Notas compartidas por amigos con el usuario actual y donde el autor no es el usuario actual
+          (note.author_id.$oid !== currentUser._id.$oid &&
+            note.shared_to_ids.some((idObj) => idObj.$oid === currentUser._id.$oid))
+        );
+      });
+    }
+
     if (selectedDate !== null) {
       // Aplica el filtro de fecha
       const now = new Date();
@@ -450,16 +501,16 @@ const NoteContainer = () => {
         }
       });
     }
-  
+
     setFilteredNotes(filteredNotes);
   };
-  
+
   const sortNotes = () => {
     const sortedNotes = [...filteredNotes];
-  
+
     sortedNotes.sort((a, b) => {
       let comparison = 0;
-  
+
       // Ordena según el criterio seleccionado
       switch (sortCriteria) {
         case "title":
@@ -474,17 +525,17 @@ const NoteContainer = () => {
         default:
           break;
       }
-  
+
       return sortAscending ? comparison : -comparison;
     });
     setFilteredNotes(sortedNotes);
   };
 
-  useEffect (() => {
+  useEffect(() => {
     applyFilters();
-  }, [selectedCollection, selectedFriend, selectedDate]);
+  }, [selectedCollections, selectedFriends, selectedDate]);
 
-  useEffect (() => {
+  useEffect(() => {
     sortNotes();
   }, [sortCriteria, sortAscending]);
 
@@ -505,8 +556,8 @@ const NoteContainer = () => {
           <FriendsSidebar />
 
           <Toolbar
-            setSelectedCollection={setSelectedCollection}
-            setSelectedFriend={setSelectedFriend}
+            setSelectedCollections={setSelectedCollections}
+            setSelectedFriends={setSelectedFriends}
             setSelectedDate={setSelectedDate}
             setSortCriteria={setSortCriteria}
             setSortAscending={setSortAscending}
@@ -515,8 +566,8 @@ const NoteContainer = () => {
             collections={collections}
             sortCriteria={sortCriteria}
             selectedDate={selectedDate}
-            selectedFriend={selectedFriend}
-            selectedCollection={selectedCollection}
+            selectedFriends={selectedFriends}
+            selectedCollections={selectedCollections}
           />
 
 
@@ -562,58 +613,76 @@ const NoteContainer = () => {
               return (
 
 
-                  <div class="card" style={{ padding: "3px 3px 3px 3px", margin: "5px 5px 5px 5px", width: "18rem", height: "15rem", backgroundColor: bgColor, overflow: "visible" }}>
-
-                    <div class="card-body" style={{ flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer' }}  data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#showModal" id={i} onClick={() => cargarModalVer(note)} >
-                      {/*<div data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#showModal" id={[i, note.title, note.content]} onMouseEnter={guardarEstado} onClick={cargarModalVer}>*/ }
-
-                        <h5 class="card-title"><strong>{note.title}</strong></h5>
-
-                        <div class="card-text-preview scrollbar-primary" dangerouslySetInnerHTML={{ __html: note.contentPreview ? note.contentPreview : note.content }} />
-
+                <div class="card" style={{ padding: "3px 3px 3px 3px", margin: "5px 5px 5px 5px", width: "18rem", height: "15rem", backgroundColor: bgColor, overflow: "visible" }}>
+                  {note.author_id.$oid !== currentUser._id.$oid && (
+                    <div class="shared-note-icon">
+                      <div class="shared-note-icon-inner">
+                      <BsPersonFill color="white" size="1.5rem" />
+                      </div>
                     </div>
+                  )}
+                  <div class="card-body" style={{ flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer' }} data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#showModal" id={i} onClick={() => cargarModalVer(note)} >
+                    {/*<div data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#showModal" id={[i, note.title, note.content]} onMouseEnter={guardarEstado} onClick={cargarModalVer}>*/}
 
-                    <div class="card-expand" style={{ overflow: "visible" }} >
-                      <div class="card-expand-content">
+                    <h5 class="card-title"><strong>{note.title}</strong></h5>
+
+                    <div class="card-text-preview scrollbar-primary" dangerouslySetInnerHTML={{ __html: note.contentPreview ? note.contentPreview : note.content }} />
+
+                  </div>
+
+                  <div class="card-expand" style={{ overflow: "visible" }} >
+                    <div class="card-expand-content">
                       {/* Aquí va el contenido adicional que deseas mostrar en la animación */}
                       <div style={{ display: 'flex', justifyContent: 'center' }}>
-                      <div className="class-icons" id={[i, note.title]}>
+                        <div className="class-icons" id={[i, note.title]}>
 
-                        <div class="class-icon">
-                          <Dropdown>
-                            <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components">
-                              <BiListPlus className="custom-note-icon" size="1.7rem" cursor="pointer" />
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                              {collections.map((collection) => (
-                                <Dropdown.Item
-                                  key={collection._id.$oid}
-                                  onClick={() => addNoteToCollection(collection._id.$oid, note._id.$oid)}
-                                >
-                                  {collection.title}
-                                </Dropdown.Item>
-                              ))}
-                            </Dropdown.Menu>
-                          </Dropdown>
+                          <div class="class-icon">
+                            <Dropdown>
+                              <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components">
+                                <BiListPlus className="custom-note-icon" size="1.7rem" cursor="pointer" />
+                              </Dropdown.Toggle>
+                              <Dropdown.Menu>
+                                {collections.length > 0 ? collections.map((collection) => (
+                                  <Dropdown.Item
+                                    key={collection._id.$oid}
+                                    onClick={() => addNoteToCollection(collection._id.$oid, note)}
+                                    active={
+                                      note.parent_collection_ids
+                                        ? note.parent_collection_ids.some((idObj) => idObj.$oid === collection._id.$oid)
+                                        : false
+                                    }
+                                  >
+                                    {collection.title}
+                                  </Dropdown.Item>
+                                )) : <Dropdown.Item
+                                  onClick={(e) => e.preventDefault()}
+                                  style={{
+                                    cursor: "default",
+                                    backgroundColor: "transparent",
+                                    pointerEvents: "none",
+                                  }}
+                                >No hay colecciones</Dropdown.Item>}
+                              </Dropdown.Menu>
+                            </Dropdown>
+                          </div>
+
+                          <div class="class-icon" >
+                            <BiShareAlt className="custom-note-icon" onClick={() => handleShareModal(note)} size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#shareModal" cursor="pointer" />
+                          </div>
+
+                          <div class="class-icon">
+                            <BiEdit className="custom-note-icon" onClick={() => cargarModalActu(note)} size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#editModal" cursor="pointer" />
+                          </div>
+
+                          <div class="class-icon">
+                            <BiTrash className="custom-note-icon" onClick={() => cargarModalDelete(note)} size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#deleteModal" cursor="pointer" />
+                          </div>
+
                         </div>
-
-                        <div class="class-icon" >
-                          <BiShareAlt className="custom-note-icon" onClick={() => handleShareModal(note)} size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#shareModal" cursor="pointer" />
-                        </div>
-
-                        <div class="class-icon">
-                          <BiEdit className="custom-note-icon" onClick={() => cargarModalActu(note)} size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#editModal" cursor="pointer" />
-                        </div>
-
-                        <div class="class-icon">
-                          <BiTrash className="custom-note-icon" onClick={() => cargarModalDelete(note)} size="1.5rem" data-backdrop="static" data-keyboard="false" data-bs-toggle="modal" data-bs-target="#deleteModal" cursor="pointer" />
-                        </div>
-
-                      </div>
-                      </div>
                       </div>
                     </div>
                   </div>
+                </div>
 
               );
 
@@ -658,10 +727,10 @@ const NoteContainer = () => {
                   <div class="modal-body">
                     {/*<textarea id="updateNoteContent" defaultValue="test" rows="4" cols="60" />*/}
                     <div>
-                    <QuillEditor
-                      onEditorReady={handleEditorReady}
-                      getCurrentContent={getCurrentEditingNoteContent}
-                    />
+                      <QuillEditor
+                        onEditorReady={handleEditorReady}
+                        getCurrentContent={getCurrentEditingNoteContent}
+                      />
                     </div>
                   </div>
 
@@ -686,6 +755,7 @@ const NoteContainer = () => {
               friends={friends}
               sharedFriends={sharedFriends}
               updateSharedItem={updateSharedNote}
+              item={noteToShare}
               itemType='nota'
             />
 

@@ -36,14 +36,16 @@ class Api::CollectionsController < ApplicationController
     end
   end
 
-  # POST /collections/:collection_id/add_note
+  # PUT /collections/:collection_id/add_note
   def add_note
     @note = Note.find(params[:note_id])
-    @note.parent_collection_id = @collection.id
+    puts("Nota: #{@note._id}")
+    puts("Colección: #{@collection._id}")
+    @note.parent_collections << @collection
     @note.save
   
     # Aquí va la lógica para añadir la nota a la colección
-    @collection.notes << @note.id
+    @collection.notes << @note
   
     if @collection.save
       render json: { message: 'Note successfully added to collection' }, status: :ok
@@ -53,14 +55,14 @@ class Api::CollectionsController < ApplicationController
     end
   end
 
-  # POST /collections/:collection_id/remove_note
+  # PUT /collections/:collection_id/remove_note
   def remove_note
     @note = Note.find(params[:note_id])
-    @note.parent_collection_id = nil
+    @note.parent_collections.delete(@collection)
     @note.save
 
     # Aquí va la lógica para eliminar la nota de la colección
-    @collection.notes.delete(@note.id)
+    @collection.notes.delete(@note)
 
     if @collection.save
       render json: { message: 'Note successfully removed from collection' }, status: :ok

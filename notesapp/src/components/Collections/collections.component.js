@@ -189,25 +189,29 @@ const Collections = () => {
 
     const fetchNotes = async (collectionIds) => {
         try {
-            axios.
-                get(API_URL_NOTES + `by_collections/${collectionIds.join(',')}`, { headers: AuthHeader() })
-                .then((response) => {
-                    const notesByCollection = response.data.reduce((acc, note) => {
-                        const collectionId = note.parent_collection_id.$oid;
-                        if (!acc[collectionId]) {
-                            acc[collectionId] = [];
-                        }
-                        acc[collectionId].push(note);
-                        return acc;
-                    }, {});
-                    setCollectionNotes(notesByCollection);
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-        } catch (error) {
-            console.error('Error fetching friends data:', error);
-        }
+            axios
+              .get(API_URL_NOTES + `by_collections/${collectionIds.join(',')}`, { headers: AuthHeader() })
+              .then((response) => {
+                console.log(response);
+                const notesByCollection = response.data.reduce((acc, note) => {
+                  note.parent_collection_ids.forEach((idObj) => {
+                    const collectionId = idObj.$oid;
+                    if (!acc[collectionId]) {
+                      acc[collectionId] = [];
+                    }
+                    acc[collectionId].push(note);
+                  });
+                  return acc;
+                }, {});
+                setCollectionNotes(notesByCollection);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } catch (error) {
+            console.error('Error fetching notes data:', error);
+          }
+          
     };
 
     const handleNewCollection = () => {
@@ -373,7 +377,7 @@ const Collections = () => {
 
     const removeNoteFromCollectionDb = (noteId, collectionId) => {
         axios
-            .post(API_URL_COLLECTIONS + collectionId + '/remove_note', {
+            .put(API_URL_COLLECTIONS + collectionId + '/remove_note', {
                 note_id: noteId
             }, {
                 headers: {

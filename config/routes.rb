@@ -33,8 +33,8 @@ Rails.application.routes.draw do
 
     resources :collections, only: [:index, :show, :create, :update, :destroy] do 
       member do
-        post "add_note"
-        post "remove_note"
+        put "add_note"
+        put "remove_note"
       end
     end
     get '/collections/shared_with_me', to: 'collections#shared_with_me'

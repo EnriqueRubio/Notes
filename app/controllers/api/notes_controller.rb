@@ -2,11 +2,15 @@ class Api::NotesController < ApplicationController
   before_action :set_note, only: %i[ show update destroy share unshare update_shared ]
   before_action :authenticate_api_user!
 
-  # GET /notes
-  def index
-    @notes = Note.where(author_id: current_api_user.id)
-    render json: @notes
-  end
+# GET /notes
+def index
+  authored_notes = Note.where(author_id: current_api_user.id)
+  shared_notes = Note.where(:shared_to_ids.in => [current_api_user.id])
+
+  @notes = authored_notes.or(shared_notes)
+  render json: @notes
+end
+
 
   # GET /notes/1
   def show
@@ -64,7 +68,7 @@ class Api::NotesController < ApplicationController
   def by_collections
     collection_ids = params[:collection_ids].split(',').map(&:strip)
     puts("Collection ids: #{collection_ids.inspect}")
-    @notes = Note.in(parent_collection_id: collection_ids)
+    @notes = Note.in(parent_collection_ids: collection_ids)
     puts("Notes: #{@notes}")
     render json: @notes
   end
