@@ -16,7 +16,7 @@ import {
     ListGroup,
     Modal,
 } from 'react-bootstrap';
-import { IoIosRemoveCircleOutline, IoIosRemoveCircle } from 'react-icons/io';
+import { BsPersonFill } from 'react-icons/bs';
 import { FaPlus } from 'react-icons/fa';
 import { BiShareAlt, BiEdit, BiTrash } from 'react-icons/bi';
 import { Toast } from 'bootstrap'
@@ -32,6 +32,7 @@ const API_URL_NOTES = BASE_API_URL + "notes/";
 const API_URL_FRIENDS = BASE_API_URL + 'friends/only_accepted';
 
 const Collections = () => {
+    const currentUser = AuthService.getCurrentUser();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [collections, setCollections] = useState([]);
     const [collectionNotes, setCollectionNotes] = useState({});
@@ -145,15 +146,15 @@ const Collections = () => {
         // Cargamos los amigos
         try {
             axios.get(API_URL_FRIENDS, { headers: AuthHeader() }).then(response => {
-            let friendUsers = [];
-            response.data.forEach(relationship => {
-                friendUsers.push(relationship.user);
-            });
-            setFriends(friendUsers);
+                let friendUsers = [];
+                response.data.forEach(relationship => {
+                    friendUsers.push(relationship.user);
+                });
+                setFriends(friendUsers);
             })
-            .catch(error => {
-                console.log(error);
-            });
+                .catch(error => {
+                    console.log(error);
+                });
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -161,8 +162,8 @@ const Collections = () => {
 
     const handleShareModal = (collection) => {
         if (collection.shared_to_ids) {
-          const shared = friends.filter((friend) => collection.shared_to_ids.some(sharedId => sharedId.$oid === friend._id.$oid));
-          setSharedFriends(shared);
+            const shared = friends.filter((friend) => collection.shared_to_ids.some(sharedId => sharedId.$oid === friend._id.$oid));
+            setSharedFriends(shared);
         }
         setCollectionToShare(collection);
         setShowShareModal(true);
@@ -190,28 +191,27 @@ const Collections = () => {
     const fetchNotes = async (collectionIds) => {
         try {
             axios
-              .get(API_URL_NOTES + `by_collections/${collectionIds.join(',')}`, { headers: AuthHeader() })
-              .then((response) => {
-                console.log(response);
-                const notesByCollection = response.data.reduce((acc, note) => {
-                  note.parent_collection_ids.forEach((idObj) => {
-                    const collectionId = idObj.$oid;
-                    if (!acc[collectionId]) {
-                      acc[collectionId] = [];
-                    }
-                    acc[collectionId].push(note);
-                  });
-                  return acc;
-                }, {});
-                setCollectionNotes(notesByCollection);
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-          } catch (error) {
+                .get(API_URL_NOTES + `by_collections/${collectionIds.join(',')}`, { headers: AuthHeader() })
+                .then((response) => {
+                    const notesByCollection = response.data.reduce((acc, note) => {
+                        note.parent_collection_ids.forEach((idObj) => {
+                            const collectionId = idObj.$oid;
+                            if (!acc[collectionId]) {
+                                acc[collectionId] = [];
+                            }
+                            acc[collectionId].push(note);
+                        });
+                        return acc;
+                    }, {});
+                    setCollectionNotes(notesByCollection);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        } catch (error) {
             console.error('Error fetching notes data:', error);
-          }
-          
+        }
+
     };
 
     const handleNewCollection = () => {
@@ -246,19 +246,19 @@ const Collections = () => {
     const handleShare = (updatedSharedFriends) => {
         try {
             axios.put(API_URL_COLLECTIONS + "/" + collectionToShare._id.$oid + "/update_shared",
-              {
-                'shared_to': updatedSharedFriends.map(friend => friend._id)
-              },
-              { headers: AuthHeader() })
-              .then(response => {
-                collectionToShare.shared_to_ids = updatedSharedFriends.map(friend => friend._id);
-              })
-              .catch(error => {
-                console.log(error);
-              });
-          } catch (error) {
+                {
+                    'shared_to': updatedSharedFriends.map(friend => friend._id)
+                },
+                { headers: AuthHeader() })
+                .then(response => {
+                    collectionToShare.shared_to_ids = updatedSharedFriends.map(friend => friend._id);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        } catch (error) {
             console.error('Error fetching data:', error);
-          }
+        }
     };
 
     const handleEditCollection = (collection) => {
@@ -335,11 +335,12 @@ const Collections = () => {
     };
 
     // NOTE HANDLING
-    const handleNoteClick = (note) => {
+    const handleNoteClick = (note, collection) => {
         setCurrentEditingNote(note);
         setIsEditModalOpen(true);
         setSelectedNote(note);
         setShowNoteModal(true);
+        setEditingCollection(collection);
     };
 
     const handleDeleteNoteModal = (note) => {
@@ -363,8 +364,6 @@ const Collections = () => {
     };
 
     const removeNoteFromCollection = (noteId, collectionId) => {
-        console.log(noteId);
-        console.log(collectionId);
         setCollectionNotes((prevCollectionNotes) => {
             const updatedCollectionNotes = { ...prevCollectionNotes };
             updatedCollectionNotes[collectionId] = updatedCollectionNotes[collectionId].filter(
@@ -412,7 +411,8 @@ const Collections = () => {
         setShowNoteModal(false);
     };
 
-    const updateNoteInCollection = (updatedNote, collectionId) => {
+    const updateNoteInCollection = (updatedNote) => {
+        const collectionId = editingCollection._id.$oid;
         setCollectionNotes((prevCollectionNotes) => {
             const updatedCollectionNotes = { ...prevCollectionNotes };
 
@@ -423,7 +423,6 @@ const Collections = () => {
             if (noteIndex !== -1) {
                 updatedCollectionNotes[collectionId][noteIndex] = updatedNote;
             }
-
             return updatedCollectionNotes;
         });
     };
@@ -450,7 +449,7 @@ const Collections = () => {
             )
             .then((response) => {
                 handleCloseNote();
-                updateNoteInCollection(response.data, note.parent_collection_id.$oid);
+                updateNoteInCollection(response.data);
                 //loadCollections();
                 //notification(3, friendToAdd.username);
             });
@@ -467,7 +466,7 @@ const Collections = () => {
                     <Row>
                         {collections.map((collection) => (
                             <Col key={collection.id} style={{ maxWidth: "20rem" }} >
-                                <Card className="card-container"
+                                <Card className="card-container custom-card"
                                     style={{
                                         width: '18rem',
                                         height: '23rem',
@@ -480,6 +479,13 @@ const Collections = () => {
                                         e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.175)";
                                     }}
                                 >
+                                    {collection.author_id.$oid !== currentUser._id.$oid && (
+                                        <div class="shared-collection-icon">
+                                            <div class="shared-collection-icon-inner">
+                                                <BsPersonFill color="white" size="1.5rem" />
+                                            </div>
+                                        </div>
+                                    )}
                                     <Card.Body
                                         className="form-control font-weight-bold"
                                         style={{
@@ -504,7 +510,6 @@ const Collections = () => {
                                                     key={note._id.$oid}
                                                     note={note}
                                                     collection={collection}
-                                                    index={index}
                                                     handleNoteClick={handleNoteClick}
                                                     removeNoteFromCollection={removeNoteFromCollectionDb}
                                                 />
@@ -533,6 +538,7 @@ const Collections = () => {
                         friends={friends}
                         sharedFriends={sharedFriends}
                         updateSharedItem={handleShare}
+                        item={collectionToShare}
                         itemType='colección'
                     />
 

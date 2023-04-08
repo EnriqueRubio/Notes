@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min';
+//import 'bootstrap/dist/js/bootstrap.bundle.min';
 import "./notesContainer.css";
 import ShareNoteModal from '../ShareNoteModal/ShareNoteModal';
 import { Toast } from 'bootstrap'
@@ -177,14 +177,12 @@ const NoteContainer = () => {
           console.log(error);
         });
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching notes data:', error);
     }
   };
 
   useEffect(() => {
-    const user = AuthService.getCurrentUser();
-
-    if (user) {
+    if (currentUser) {
       setIsLoggedIn(true);
     } else {
       navigate('/login');
@@ -200,7 +198,7 @@ const NoteContainer = () => {
           console.log(error);
         });
     } catch (error) {
-      console.error('Error fetching friends data:', error);
+      console.error('Error fetching collections data:', error);
     }
 
     // Cargamos los amigos
@@ -216,7 +214,7 @@ const NoteContainer = () => {
           console.log(error);
         });
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching friends data:', error);
     }
   }, [navigate]);
 
@@ -469,12 +467,13 @@ const NoteContainer = () => {
           note.shared_to_ids.some((idObj) =>
             selectedFriends.some((friend) => friend._id.$oid === idObj.$oid)
           ) ||
-          // Notas compartidas por amigos con el usuario actual y donde el autor no es el usuario actual
-          (note.author_id.$oid !== currentUser._id.$oid &&
-            note.shared_to_ids.some((idObj) => idObj.$oid === currentUser._id.$oid))
+          // Notas compartidas por amigos con el usuario actual y donde el autor es alguno de los amigos seleccionados
+          selectedFriends.some((friend) => friend._id.$oid === note.author_id.$oid) &&
+          note.shared_to_ids.some((idObj) => idObj.$oid === currentUser._id.$oid)
         );
       });
     }
+    
 
     if (selectedDate !== null) {
       // Aplica el filtro de fecha
@@ -613,7 +612,7 @@ const NoteContainer = () => {
               return (
 
 
-                <div class="card" style={{ padding: "3px 3px 3px 3px", margin: "5px 5px 5px 5px", width: "18rem", height: "15rem", backgroundColor: bgColor, overflow: "visible" }}>
+                <div class="card custom-card" style={{ padding: "3px 3px 3px 3px", margin: "5px 5px 5px 5px", width: "18rem", height: "15rem", backgroundColor: bgColor, overflow: "visible" }}>
                   {note.author_id.$oid !== currentUser._id.$oid && (
                     <div class="shared-note-icon">
                       <div class="shared-note-icon-inner">

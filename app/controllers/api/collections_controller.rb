@@ -3,8 +3,15 @@ class Api::CollectionsController < ApplicationController
   before_action :authenticate_api_user!
 
   # GET /collections
-  def index
-    @collections = Collection.where(author: current_api_user.id)
+def index
+    @user = User.find_by(id: current_api_user.id)
+    if(@user.admin)
+      @collections = Collection.all
+    else
+      authored_collections = Collection.where(author_id: current_api_user.id)
+      shared_collections = Collection.where(:shared_to_ids.in => [current_api_user.id])
+      @collections = authored_collections + shared_collections
+    end
     render json: @collections
   end
 

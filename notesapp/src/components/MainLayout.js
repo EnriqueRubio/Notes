@@ -1,13 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import NavBar from './NavBar/NavBar';
-import { Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
+import AuthContext from '../AuthContext';
+import AuthService from "../services/auth.service";
 
-const MainLayout = ({ children, onColorChange }) => {
+const MainLayout = ({ onLogout }) => {
+  let { currentUser, setCurrentUser } = useContext(AuthContext);
+  if (!currentUser) {
+    currentUser = AuthService.getCurrentUser();
+    if(!currentUser){
+      return <Navigate to="/login" />;
+    }
+  }
   return (
     <div>
-      <NavBar />
-      {children}
-      <Outlet onColorChange={onColorChange} />
+      <NavBar currentUser={currentUser} onLogout={onLogout} />
+      <Outlet />
     </div>
   );
 };

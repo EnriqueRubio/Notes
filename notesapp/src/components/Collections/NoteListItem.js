@@ -6,7 +6,6 @@ import { ListGroup, Modal, Button } from 'react-bootstrap';
 const NoteListItem = ({
     note,
     collection,
-    index,
     handleNoteClick,
     removeNoteFromCollection,
   }) => {
@@ -22,7 +21,7 @@ const NoteListItem = ({
     return (
       <ListGroup.Item
         key={note._id.$oid}
-        onClick={() => handleNoteClick(note)}
+        onClick={() => handleNoteClick(note, collection)}
         style={{ cursor: "pointer" }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = "#e8e8e8";

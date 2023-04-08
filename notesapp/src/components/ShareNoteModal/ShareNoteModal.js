@@ -14,8 +14,6 @@ const ShareNoteModal = ({ show, onHide, friends, sharedFriends, updateSharedItem
 
     if (item) {
         author = friends.find((friend) => friend._id.$oid === item.author_id.$oid);
-        console.log(author);
-        console.log(user);
     }
 
     useEffect(() => {

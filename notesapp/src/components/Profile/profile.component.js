@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import Dropzone from 'react-dropzone';
 import { MdEdit } from 'react-icons/md';
 import { FaUser, FaCrown } from 'react-icons/fa';
 import {
@@ -11,7 +10,6 @@ import {
   Form,
   Button,
   ListGroup,
-  Modal,
   OverlayTrigger,
   Tooltip,
 } from 'react-bootstrap';
@@ -302,11 +300,11 @@ const UserProfile = () => {
             <Row>
               <Col className="d-flex flex-column align-items-center justify-content-center">
                 <p><strong>Usuario desde</strong> {user ? formatDate(user.created_at) : 'Cargando...'}</p>
-                <p style={{marginTop: '50px'}}><strong>Nº de notas:</strong> {number_of_notes ? number_of_notes : 'Cargando...'}</p>
+                <p style={{marginTop: '50px'}}><strong>Nº de notas:</strong> {number_of_notes ? number_of_notes : '0'}</p>
               </Col>
               <Col className="d-flex flex-column align-items-center justify-content-center">
                 <UserRole isAdmin={user ? user.admin : false} />
-                <p style={{marginTop: '50px'}} ><strong>Nº de colecciones:</strong> {number_of_collections ? number_of_collections : 'Cargando...'}</p>
+                <p style={{marginTop: '50px'}} ><strong>Nº de colecciones:</strong> {number_of_collections ? number_of_collections : '0'}</p>
               </Col>
             </Row>
           </Card.Body>

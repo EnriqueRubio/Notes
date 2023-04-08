@@ -1,17 +1,17 @@
-.card {
+.custom-card {
 	position: relative;
 	overflow: hidden;
 	transition: all 0.3s ease;
 }
 
-.card:hover {
+.custom-card:hover {
 	transform: scale(1.15);
 	z-index: 999;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 
 }
   
-.card:hover .card-expand {
+.custom-card:hover .card-expand {
 	height: 20%;
 	opacity: 1;
 }

@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   namespace :api do
     devise_for :users,
-      path: 'user',
+      path: 'users',
       path_names: {
         sign_in: 'signin',
         sign_out: 'logout',
@@ -12,6 +12,8 @@ Rails.application.routes.draw do
         registrations: 'users/registrations'
       }
 
+    get '/users', to: 'users#index'
+    delete '/users/:id', to: 'users#destroy'
     get '/users/search', to: 'users#search'
     get 'users/:id', to: 'users#show', as: 'user'
     get 'users/:id/avatar', to: 'avatars#show', as: 'user_avatar'

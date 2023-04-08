@@ -4,36 +4,41 @@ class Api::FriendshipsController < ApplicationController
     
     # GET /friendships
     def index
-        @friendships = Friendship.where(sender: current_api_user.id).or(Friendship.where(receiver: current_api_user.id))
+        @user = User.find_by(id: current_api_user.id)
+        if(@user.admin)
+          @friends = Friendship.all
+        else
+            @friendships = Friendship.where(sender: current_api_user.id).or(Friendship.where(receiver: current_api_user.id))
 
-        # Hacer una lista de users que son amigos del usuario actual
-        @friends = []
-        @friendships.each do |friendship|
-            friend = nil
-            friend_status = nil
-            if friendship.sender == current_api_user
-                friend = friendship.receiver
-                if(friendship.status == "pending")
-                    friend_status = "sent"
+            # Hacer una lista de users que son amigos del usuario actual
+            @friends = []
+            @friendships.each do |friendship|
+                friend = nil
+                friend_status = nil
+                if friendship.sender == current_api_user
+                    friend = friendship.receiver
+                    if(friendship.status == "pending")
+                        friend_status = "sent"
+                    else
+                        friend_status = "accepted"
+                    end
                 else
-                    friend_status = "accepted"
+                    friend = friendship.sender
+                    if(friendship.status == "pending")
+                        friend_status = "received"
+                    else
+                        friend_status = "accepted"
+                    end
                 end
-            else
-                friend = friendship.sender
-                if(friendship.status == "pending")
-                    friend_status = "received"
-                else
-                    friend_status = "accepted"
-                end
+                friend_data = {
+                    relationship_id: friendship.id,
+                    user: friend,
+                    relationship_creation_date: friendship.created_at,
+                    relationship_update_date: friendship.updated_at,
+                    status: friend_status
+                }
+                @friends << friend_data
             end
-            friend_data = {
-                relationship_id: friendship.id,
-                user: friend,
-                relationship_creation_date: friendship.created_at,
-                relationship_update_date: friendship.updated_at,
-                status: friend_status
-            }
-            @friends << friend_data
         end
         render json: @friends
     end
@@ -102,12 +107,29 @@ class Api::FriendshipsController < ApplicationController
     
     # PATCH/PUT /friendships/1
     def update
-        if @friendship.update_attribute(:status, friendship_params[:status])
+        # Verifica si se pasaron sender y receiver como parámetros
+        if friendship_params[:sender] && friendship_params[:receiver]
+            # Busca a los usuarios con los ids proporcionados
+            sender = User.find(friendship_params[:sender])
+            receiver = User.find(friendship_params[:receiver])
+    
+            # Actualiza la amistad con la información proporcionada
+            if @friendship.update(
+                status: friendship_params[:status],
+                sender: sender,
+                receiver: receiver
+            )
+                render json: @friendship, status: :ok
+            else
+                render json: @friendship.errors, status: :unprocessable_entity
+            end
+        elsif @friendship.update_attribute(:status, friendship_params[:status])
             render json: @friendship, status: :ok
         else
             render json: @friendship.errors, status: :unprocessable_entity
         end
     end
+    
     
     # DELETE /friendships/1
     def destroy

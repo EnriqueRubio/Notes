@@ -4,10 +4,14 @@ class Api::NotesController < ApplicationController
 
 # GET /notes
 def index
-  authored_notes = Note.where(author_id: current_api_user.id)
-  shared_notes = Note.where(:shared_to_ids.in => [current_api_user.id])
-
-  @notes = authored_notes.or(shared_notes)
+  @user = User.find_by(id: current_api_user.id)
+  if(@user.admin)
+    @notes = Note.all
+  else
+    authored_notes = Note.where(author_id: current_api_user.id)
+    shared_notes = Note.where(:shared_to_ids.in => [current_api_user.id])
+    @notes = authored_notes + shared_notes
+  end
   render json: @notes
 end
 
@@ -32,13 +36,26 @@ end
   # PATCH/PUT /notes/1
   def update
     @note.author_id = current_api_user.id
-
-    if @note.update(note_params)
+  
+    # Buscar y asociar los objetos de colecciones y usuarios relacionados solo si están presentes en los parámetros
+    if note_params[:parent_collections]
+      parent_collections = Collection.find(note_params[:parent_collections].map { |id_obj| id_obj[:$oid] })
+      @note.parent_collections = parent_collections
+    end
+  
+    if note_params[:shared_to]
+      shared_users = User.find(note_params[:shared_to].map { |id_obj| id_obj[:$oid] })
+      @note.shared_to = shared_users
+    end
+  
+    # Actualizar la nota con los nuevos objetos asociados y otros parámetros
+    if @note.update(note_params.except(:parent_collections, :shared_to))
       render json: @note
     else
       render json: @note.errors, status: :unprocessable_entity
     end
   end
+  
 
   # DELETE /notes/1
   def destroy
@@ -136,6 +153,6 @@ end
 
   # Only allow a list of trusted parameters through.
   def note_params
-    params.require(:note).permit(:title, :attachments, :avatar, content: {})
+    params.require(:note).permit(:title, :attachments, :avatar, content: {}, parent_collections: [:$oid], shared_to: [:$oid])
   end  
 end
