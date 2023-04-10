@@ -1,46 +1,114 @@
-
+import React, { useContext } from 'react';
+import { useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min';
-import React from 'react';
+import { useNavigate, NavLink } from 'react-router-dom';
+import { Navbar, Nav, NavDropdown, Form, FormControl, Button } from 'react-bootstrap';
 import "./NavBar.css"
 import "../NotesContainer/NotesContainer"
+import AuthService from "../../services/auth.service";
+import AuthContext from '../../AuthContext';
+/*
+function logOut() {
+  AuthService.logout();
+  this.setState({
+    showModeratorBoard: false,
+    showAdminBoard: false,
+    currentUser: undefined,
+  });
+}
+const currentUser = AuthService.getCurrentUser();
+*/
 
-function NavBar() {
+const API_URL = "http://localhost:3000";
+
+function NavBar({ onLogout }) {
+  const currentUser = AuthService.getCurrentUser();
+
+  function logOut() {
+    AuthService.logout();
+    onLogout();
+  }
+
   return (
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <Navbar bg="dark" expand="lg" variant="dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-          My Notes App
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href='/ajustes'>Ajustes</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href='/informacion'>Información</a>
-            </li>
-          </ul>
-          <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"></input>
-            <button class="btn btn-outline-success" type="submit">Search</button>
-          </form>
-        </div>
+        <Navbar.Brand>My Notes App</Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbarSupportedContent" />
+        <Navbar.Collapse id="navbarSupportedContent">
+          <Nav className="me-auto mb-2 mb-lg-0">
+            <Nav.Item>
+              <NavLink to={currentUser.admin ? "/admin/notes" : "/"} exact activeClassName="active" className="nav-link">
+                Notas
+              </NavLink>
+            </Nav.Item>
+            <Nav.Item>
+              <NavLink to={currentUser.admin ? "/admin/collections" : "/collections"} activeClassName="active" className="nav-link">
+                Colecciones
+              </NavLink>
+            </Nav.Item>
+            {currentUser?.admin && (
+              <>
+                <Nav.Item>
+                  <NavLink to="/admin/users" activeClassName="active" className="nav-link">
+                    Usuarios
+                  </NavLink>
+                </Nav.Item>
+                <Nav.Item>
+                  <NavLink to="/admin/relations" activeClassName="active" className="nav-link">
+                    Relaciones
+                  </NavLink>
+                </Nav.Item>
+              </>
+            )}
+          </Nav>
+
+          {currentUser?.admin && (
+            <Nav>
+              <Nav.Item>
+                <NavLink className="logout-admins" to="/login" href="/login" onClick={logOut} >
+                  Logout
+                </NavLink>
+              </Nav.Item>
+            </Nav>
+          )}
+
+          {currentUser?.admin == false && (<>
+            <Form className="d-flex" role="search">
+              <FormControl
+                type="search"
+                placeholder="Buscar"
+                className="me-2"
+                aria-label="Search"
+              />
+              <Button type="submit">Buscar</Button>
+            </Form>
+            <Nav>
+              <NavDropdown
+                title={
+                  <img
+                    src={currentUser?.avatar.url ? API_URL + currentUser.avatar.url : "https://s3.eu-central-1.amazonaws.com/bootstrapbaymisc/blog/24_days_bootstrap/fox.jpg"}
+                    width="40"
+                    height="40"
+                    className="rounded-circle"
+                    alt="User profile"
+                    zIndex="1000"
+                  />
+                }
+                id="navbarDropdownMenuLink"
+              >
+                <NavDropdown.Item href="/profile">Perfil</NavDropdown.Item>
+                {/* <NavDropdown.Item href="/settings">Ajustes</NavDropdown.Item> */}
+                <NavDropdown.Item href="/login" onClick={logOut}>
+                  Logout
+                </NavDropdown.Item>
+              </NavDropdown>
+            </Nav>
+          </>
+          )}
+        </Navbar.Collapse>
       </div>
-    </nav>
+    </Navbar>
   );
 }
 
 export default NavBar;
-
-
-
-
-
-
-
-
