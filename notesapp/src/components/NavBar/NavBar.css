@@ -3,6 +3,7 @@
     justify-content: space-between;
     align-items: center;
     margin: 10px;
+    border-radius: 5px;
   }
   
   .nav-link {
@@ -12,4 +13,14 @@
   .form-inline {
     display: flex;
     align-items: center;
+  }
+
+  .logout-admins {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .logout-admins:hover {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.75);
   }

@@ -1,0 +1,55 @@
+.striped-list-group-item:nth-child(odd) {
+    background-color: #e0e0e0;
+}
+
+.full-height {
+    height: 89vh;
+}
+  
+.full-height-col {
+    height: 89%;
+    overflow-y: auto; /* Para hacer scroll si el contenido excede la altura */
+    min-height: calc(89vh - 60px);
+}
+
+.custom-border {
+    border: 2px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.custom-th {
+    text-align: center;
+}
+
+.sortable-th {
+    cursor: pointer;
+}
+
+.sortable-th:hover {
+    background-color: #e0e0e0;
+}
+
+.custom-td {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.custom-tr {
+    cursor: pointer;
+}
+
+.custom-tr:hover {
+    background-color: #e0e0e0;
+}
+
+.custom-swap-icon {
+    position: absolute;
+    left: 4.3rem;
+    top: -1.9rem;
+    cursor: pointer;
+}
+
+.custom-swap-icon:hover {
+    color: #4285F4;
+}

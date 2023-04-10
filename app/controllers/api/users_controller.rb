@@ -1,5 +1,6 @@
 class Api::UsersController < ApplicationController
-  before_action :set_user, only: %i[ show update destroy ]
+  before_action :set_user, only: %i[ show update destroy number_of_notes number_of_collections ]
+  before_action :authenticate_api_user!
 
   # GET /users
   def index
@@ -10,15 +11,15 @@ class Api::UsersController < ApplicationController
 
   # GET /users/1
   def show
-    render json: @user
+    render json: @user, status: :ok
   end
 
   # POST /users
   def create
     @user = User.new(user_params)
-
+    
     if @user.save
-      render json: @user, status: :created, location: @user
+      render json: @user, status: :created
     else
       render json: @user.errors, status: :unprocessable_entity
     end
@@ -26,6 +27,7 @@ class Api::UsersController < ApplicationController
 
   # PATCH/PUT /users/1
   def update
+    puts("PARAMS: #{user_params}")
     if @user.update(user_params)
       render json: @user
     else
@@ -36,6 +38,39 @@ class Api::UsersController < ApplicationController
   # DELETE /users/1
   def destroy
     @user.destroy
+  end
+
+  # GET /users/search
+  def search
+    query = params[:q]
+
+    if query.present?
+      users = User.or({ username: /#{query}/i }, { email: /#{query}/i })
+      friends = Friendship.where(sender: current_api_user.id).or(Friendship.where(receiver: current_api_user.id))
+      friends_ids = friends.pluck(:sender_id, :receiver_id).flatten.uniq
+      users = users.not_in(id: friends_ids + [current_api_user.id])
+      puts("users: #{users}")
+
+      if users.any?
+        render json: users, status: :ok
+      else
+        render json: { message: "No users found." }, status: :ok
+      end
+    else
+      render json: { message: "Search query is empty." }, status: :bad_request
+    end
+  end
+
+  # GET /users/:id/number_of_notes
+  def number_of_notes
+    number_of_notes = Note.where(author: current_api_user.id).count
+    render json: { "number_of_notes": number_of_notes }, status: :ok
+  end
+
+  # GET /users/:id/number_of_collections
+  def number_of_collections
+    number_of_collections = Collection.where(author: current_api_user.id).count
+    render json: { "number_of_collections": number_of_collections }, status: :ok
   end
 
   private
