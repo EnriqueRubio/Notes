@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import AdminCrudTemplate from '../AdminCrudTemplate';
+import { Form } from 'react-bootstrap';
 import { FaUser, FaCrown, FaSortAlphaDown, FaSortAlphaUp } from 'react-icons/fa';
 import "../AdminCrud.css";
 import AuthHeader from "../../../services/auth-header";
@@ -232,6 +233,125 @@ const AdminUsersBoard = ({ users }) => {
         );
     }
 
+    const searchFunction = (user, searchTerm) => {
+        return user.username.toLowerCase().includes(searchTerm.toLowerCase()) || user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    };
+
+    //FILTERS
+    const [selectedRole, setSelectedRole] = useState([]);
+    const [selectedCreated, setSelectedCreated] = useState('');
+    const [selectedModified, setSelectedModified] = useState('');
+
+    const handleCreatedSelect = (event) => {
+        setSelectedCreated(event.target.value);
+    };
+
+    const handleModifiedSelect = (event) => {
+        setSelectedModified(event.target.value);
+    };
+
+    const handleRoleSelect = (event) => {
+        setSelectedRole(event.target.value);
+    };
+
+    const renderFilterOptions = () => {
+        return (
+            <>
+                <Form.Group controlId="filter">
+                    <Form.Label><strong>Fecha de creación:</strong></Form.Label>
+                    <Form.Select onChange={handleCreatedSelect}>
+                        <option value="">Selecciona un rango</option>
+                        <option value="created_recently">Reciente</option>
+                        <option value="created_today">Hoy</option>
+                        <option value="created_this_week">Esta semana</option>
+                        <option value="created_this_month">Este mes</option>
+                        <option value="created_this_year">Este año</option>
+                        <option value="created_older">Más antigua</option>
+                    </Form.Select>
+                    <hr />
+                    <Form.Label><strong>Fecha de modif.:</strong></Form.Label>
+                    <Form.Select onChange={handleModifiedSelect}>
+                        <option value="">Selecciona un rango</option>
+                        <option value="created_recently">Reciente</option>
+                        <option value="created_today">Hoy</option>
+                        <option value="created_this_week">Esta semana</option>
+                        <option value="created_this_month">Este mes</option>
+                        <option value="created_this_year">Este año</option>
+                        <option value="created_older">Más antigua</option>
+                    </Form.Select>
+                    <hr />
+                    <Form.Label><strong>Rol:</strong></Form.Label>
+                    <Form.Select onChange={handleRoleSelect}>
+                        <option value="">Selecciona un rol</option>
+                        <option value="0">Usuario</option>
+                        <option value="1">Administrador</option>
+                    </Form.Select>
+                </Form.Group>
+            </>
+        );
+    };
+
+    const dateFilter = (date, filter) => {
+        const currentDate = new Date();
+        const providedDate = new Date(date);
+        const timeDifference = currentDate - providedDate;
+
+        // Convertir la diferencia de tiempo a horas, días, meses y años
+        const hoursDifference = timeDifference / (1000 * 60 * 60);
+        const daysDifference = hoursDifference / 24;
+        const monthsDifference = daysDifference / 30.44; // Promedio de días por mes
+        const yearsDifference = daysDifference / 365.25; // Promedio de días por año
+
+        switch (filter) {
+            case 'created_recently':
+                return hoursDifference <= 1;
+            case 'created_today':
+                return daysDifference < 1;
+            case 'created_this_week':
+                return daysDifference < 7;
+            case 'created_this_month':
+                return monthsDifference < 1;
+            case 'created_this_year':
+                return yearsDifference < 1;
+            case 'created_older':
+                return yearsDifference >= 1;
+            default:
+                return true;
+        }
+    };
+
+
+    const filterFunction = (note) => {
+        // Aplica el filtro de fecha de creación
+        if (!dateFilter(note.created_at, selectedCreated)) {
+            return false;
+        }
+
+        // Aplica el filtro de fecha de modificación
+        if (!dateFilter(note.updated_at, selectedModified)) {
+            return false;
+        }
+
+        // Aplica el filtro de autor
+        switch (selectedRole) {
+            case '0':
+                if (note.admin) {
+                    return false;
+                }
+                break;
+            case '1':
+                if (!note.admin) {
+                    return false;
+                }
+                break;
+            default:
+                break;
+        }
+
+        // Si todos los filtros se aplican correctamente, devuelve verdadero
+        return true;
+    };
+
     return (
         <>
             <CreateUserModal
@@ -252,6 +372,10 @@ const AdminUsersBoard = ({ users }) => {
                 renderHeader={renderHeader}
                 renderRow={renderRow}
                 handleCreateModal={handleCreateModal}
+                page={"usuarios"}
+                searchFunction={searchFunction}
+                renderFilterOptions={renderFilterOptions}
+                filterFunction={filterFunction}
             />
         </>
     );

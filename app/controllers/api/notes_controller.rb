@@ -35,7 +35,9 @@ end
 
   # PATCH/PUT /notes/1
   def update
-    @note.author_id = current_api_user.id
+    if !current_api_user.admin
+      @note.author_id = current_api_user.id
+    end
   
     # Buscar y asociar los objetos de colecciones y usuarios relacionados solo si están presentes en los parámetros
     if note_params[:parent_collections]

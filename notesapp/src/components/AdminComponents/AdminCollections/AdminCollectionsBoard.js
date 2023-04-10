@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import AdminCrudTemplate from '../AdminCrudTemplate';
-import { Dropdown, DropdownButton } from 'react-bootstrap';
+import { Form, Dropdown, DropdownButton } from 'react-bootstrap';
+import Select from 'react-select';
 import { FaSortAlphaDown, FaSortAlphaUp } from 'react-icons/fa';
 import CreateCollectionModal from '../Modals/CreateCollectionModal';
 import AuthHeader from "../../../services/auth-header";
@@ -22,7 +23,7 @@ const AdminCollectionsBoard = ({ notes, collections, users }) => {
 
     const renderChildNotesDropdown = (noteIds) => (
         noteIds.length > 0 ? (
-            <DropdownButton id="childNotesDropdown" title={"Notas (" + noteIds.length + ")"}>
+            <DropdownButton id="childNotesDropdown" title={"Notas (" + noteIds.length + ")"} onClick={handleDropdownClick}>
                 {noteIds.map((idObj) => {
                     const id = idObj.$oid;
                     const title = getNoteTitleById(id);
@@ -38,7 +39,7 @@ const AdminCollectionsBoard = ({ notes, collections, users }) => {
 
     const renderSharedToDropdown = (sharedToIds) => (
         sharedToIds.length > 0 ? (
-            <DropdownButton id="sharedToDropdown" title={"Compartidos (" + sharedToIds.length + ")"}>
+            <DropdownButton id="sharedToDropdown" title={"Compartidos (" + sharedToIds.length + ")"} onClick={handleDropdownClick}>
                 {sharedToIds.map((idObj) => {
                     const id = idObj.$oid;
                     const username = getUsernameById(id);
@@ -52,6 +53,9 @@ const AdminCollectionsBoard = ({ notes, collections, users }) => {
         )
     );
 
+    const handleDropdownClick = (event) => {
+        event.stopPropagation();
+    };
 
     const getNoteTitleById = (id) => {
         const note = notes.find((note) => note._id.$oid === id);
@@ -117,7 +121,7 @@ const AdminCollectionsBoard = ({ notes, collections, users }) => {
 
     const updateCollections = (updatedCollection) => {
         const updatedCollections = localCollections.map((collection) =>
-        collection._id.$oid === updatedCollection._id.$oid ? updatedCollection : collection
+            collection._id.$oid === updatedCollection._id.$oid ? updatedCollection : collection
         );
         setLocalCollections(updatedCollections);
     };
@@ -249,8 +253,8 @@ const AdminCollectionsBoard = ({ notes, collections, users }) => {
             <td className="custom-td">{collection.title}</td>
             <td className="custom-td">{collection.description}</td>
             <td className="custom-td">{collection.textColor}</td>
-            <td className="custom-td">{collection.bgColor}</td>
-            <td className="custom-td">{collection.borderColor}</td>
+            <td className="custom-td" style={{ backgroundColor: collection.bgColor, borderRadius: "10px"}}>{collection.bgColor}</td>
+            <td className="custom-td" style={{ backgroundColor: collection.borderColor, borderRadius: "10px" }}>{collection.borderColor}</td>
             <td className="custom-td">{getUsernameById(collection.author_id.$oid)}</td>
             <td className="custom-td">{formatDate(collection.created_at)}</td>
             <td className="custom-td">{formatDate(collection.updated_at)}</td>
@@ -259,6 +263,166 @@ const AdminCollectionsBoard = ({ notes, collections, users }) => {
         </tr>
     );
 
+    const searchFunction = (collection, searchTerm) => {
+        return collection.title.toLowerCase().includes(searchTerm.toLowerCase());
+    };
+
+    //FILTERS
+    const [selectedUsers, setSelectedUsers] = useState([]);
+    const [selectedNotes, setSelectedNotes] = useState([]);
+    const [selectedShared, setSelectedShared] = useState([]);
+    const [selectedCreated, setSelectedCreated] = useState('');
+    const [selectedModified, setSelectedModified] = useState('');
+
+    const handleCreatedSelect = (event) => {
+        setSelectedCreated(event.target.value);
+    };
+
+    const handleModifiedSelect = (event) => {
+        setSelectedModified(event.target.value);
+    };
+
+    const handleUserSelect = (selected) => {
+        setSelectedUsers(selected);
+    };
+
+    const handleNoteSelect = (selected) => {
+        setSelectedNotes(selected);
+    };
+
+    const handleSharedSelect = (selected) => {
+        setSelectedShared(selected);
+    };
+
+    const usersOptions = users.map(user => ({
+        value: user._id.$oid,
+        label: user.username,
+    }));
+
+    const noteOptions = notes.map(note => ({
+        value: note._id.$oid,
+        label: note.title,
+    }));
+
+    const renderFilterOptions = () => {
+        return (
+            <>
+                <Form.Group controlId="filter">
+                    <Form.Label><strong>Fecha de creación:</strong></Form.Label>
+                    <Form.Select onChange={handleCreatedSelect}>
+                        <option value="">Selecciona un rango</option>
+                        <option value="created_recently">Reciente</option>
+                        <option value="created_today">Hoy</option>
+                        <option value="created_this_week">Esta semana</option>
+                        <option value="created_this_month">Este mes</option>
+                        <option value="created_this_year">Este año</option>
+                        <option value="created_older">Más antigua</option>
+                    </Form.Select>
+                    <hr />
+                    <Form.Label><strong>Fecha de modif.:</strong></Form.Label>
+                    <Form.Select onChange={handleModifiedSelect}>
+                        <option value="">Selecciona un rango</option>
+                        <option value="created_recently">Reciente</option>
+                        <option value="created_today">Hoy</option>
+                        <option value="created_this_week">Esta semana</option>
+                        <option value="created_this_month">Este mes</option>
+                        <option value="created_this_year">Este año</option>
+                        <option value="created_older">Más antigua</option>
+                    </Form.Select>
+                    <hr />
+                    <Form.Label><strong>Autor:</strong></Form.Label>
+                    <Select
+                        options={usersOptions}
+                        onChange={handleUserSelect}
+                        isMulti
+                        isSearchable
+                        placeholder="Buscar usuario"
+                        className="mb-2"
+                    />
+                    <hr />
+                    <Form.Label><strong>Nota:</strong></Form.Label>
+                    <Select
+                        options={noteOptions}
+                        onChange={handleNoteSelect}
+                        isMulti
+                        isSearchable
+                        placeholder="Buscar colec..."
+                        className="mb-2"
+                    />
+                    <hr />
+                    <Form.Label><strong>Compartidos:</strong></Form.Label>
+                    <Select
+                        options={usersOptions}
+                        onChange={handleSharedSelect}
+                        isMulti
+                        isSearchable
+                        placeholder="Buscar comp..."
+                        className="mb-2"
+                    />
+                </Form.Group>
+            </>
+        );
+    };
+
+    const dateFilter = (date, filter) => {
+        const currentDate = new Date();
+        const providedDate = new Date(date);
+        const timeDifference = currentDate - providedDate;
+
+        // Convertir la diferencia de tiempo a horas, días, meses y años
+        const hoursDifference = timeDifference / (1000 * 60 * 60);
+        const daysDifference = hoursDifference / 24;
+        const monthsDifference = daysDifference / 30.44; // Promedio de días por mes
+        const yearsDifference = daysDifference / 365.25; // Promedio de días por año
+
+        switch (filter) {
+            case 'created_recently':
+                return hoursDifference <= 1;
+            case 'created_today':
+                return daysDifference < 1;
+            case 'created_this_week':
+                return daysDifference < 7;
+            case 'created_this_month':
+                return monthsDifference < 1;
+            case 'created_this_year':
+                return yearsDifference < 1;
+            case 'created_older':
+                return yearsDifference >= 1;
+            default:
+                return true;
+        }
+    };
+
+
+    const filterFunction = (collection) => {
+        // Aplica el filtro de fecha de creación
+        if (!dateFilter(collection.created_at, selectedCreated)) {
+            return false;
+        }
+
+        // Aplica el filtro de fecha de modificación
+        if (!dateFilter(collection.updated_at, selectedModified)) {
+            return false;
+        }
+
+        // Aplica el filtro de autor
+        if (selectedUsers.length > 0 && !selectedUsers.some(user => user.value === collection.author_id.$oid)) {
+            return false;
+        }
+
+        // Aplica el filtro de colección
+        if (selectedNotes.length > 0 && !selectedNotes.some(note => collection.note_ids.some(id => id.$oid === note.value))) {
+            return false;
+        }
+
+        // Aplica el filtro de notas compartidas
+        if (selectedShared.length > 0 && !selectedShared.some(user => collection.shared_to_ids.some(id => id.$oid === user.value))) {
+            return false;
+        }
+
+        // Si todos los filtros se aplican correctamente, devuelve verdadero
+        return true;
+    };
 
     return (
         <>
@@ -281,6 +445,10 @@ const AdminCollectionsBoard = ({ notes, collections, users }) => {
                 renderHeader={renderHeader}
                 renderRow={renderRow}
                 handleCreateModal={handleCreateModal}
+                page={"colecciones"}
+                searchFunction={searchFunction}
+                renderFilterOptions={renderFilterOptions}
+                filterFunction={filterFunction}
             />
         </>
     );

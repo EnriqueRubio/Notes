@@ -138,8 +138,8 @@
   
   .shared-note-icon-inner {
 	position: absolute;
-	top: 5px;
-	left: 20px;
+	top: 3px;
+	left: 25px;
 	display: flex;
 	align-items: center;
 	justify-content: center;

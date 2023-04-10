@@ -27,7 +27,7 @@ const CreateNoteModal = ({ show, handleClose, handleNoteCreate }) => {
     };
 
     return (
-        <Modal show={show} onHide={handleClose}>
+        <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
                 <Modal.Title>Crear nueva nota</Modal.Title>
             </Modal.Header>

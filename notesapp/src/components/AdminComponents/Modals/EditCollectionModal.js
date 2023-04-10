@@ -102,9 +102,9 @@ const EditCollectionModal = ({ show, handleClose, handleCollectionUpdate, handle
 
     return (
         <>
-            <Modal show={show} onHide={handleClose}>
+            <Modal show={show} onHide={handleClose} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Editar nota</Modal.Title>
+                    <Modal.Title>Editar colección</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Container>

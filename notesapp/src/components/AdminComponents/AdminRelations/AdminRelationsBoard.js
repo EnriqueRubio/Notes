@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import AdminCrudTemplate from '../AdminCrudTemplate';
+import { Form } from 'react-bootstrap';
 import "../AdminCrud.css";
 import { FaSortAlphaDown, FaSortAlphaUp } from 'react-icons/fa';
 import AuthHeader from "../../../services/auth-header";
@@ -209,6 +210,126 @@ const AdminRelationsBoard = ({ users, relations }) => {
         setLocalRelations(updatedRelations);
     };
 
+    const searchFunction = (relation, searchTerm) => {
+        return getUsernameById(relation.sender_id.$oid).toLowerCase().includes(searchTerm.toLowerCase()) ||
+            getUsernameById(relation.receiver_id.$oid).toLowerCase().includes(searchTerm.toLowerCase());
+    };
+
+    //FILTERS
+    const [selectedStatus, setSelectedStatus] = useState([]);
+    const [selectedCreated, setSelectedCreated] = useState('');
+    const [selectedModified, setSelectedModified] = useState('');
+
+    const handleCreatedSelect = (event) => {
+        setSelectedCreated(event.target.value);
+    };
+
+    const handleModifiedSelect = (event) => {
+        setSelectedModified(event.target.value);
+    };
+
+    const handleStatusSelect = (event) => {
+        setSelectedStatus(event.target.value);
+    };
+
+    const renderFilterOptions = () => {
+        return (
+            <>
+                <Form.Group controlId="filter">
+                    <Form.Label><strong>Fecha de creación:</strong></Form.Label>
+                    <Form.Select onChange={handleCreatedSelect}>
+                        <option value="">Selecciona un rango</option>
+                        <option value="created_recently">Reciente</option>
+                        <option value="created_today">Hoy</option>
+                        <option value="created_this_week">Esta semana</option>
+                        <option value="created_this_month">Este mes</option>
+                        <option value="created_this_year">Este año</option>
+                        <option value="created_older">Más antigua</option>
+                    </Form.Select>
+                    <hr />
+                    <Form.Label><strong>Fecha de modif.:</strong></Form.Label>
+                    <Form.Select onChange={handleModifiedSelect}>
+                        <option value="">Selecciona un rango</option>
+                        <option value="created_recently">Reciente</option>
+                        <option value="created_today">Hoy</option>
+                        <option value="created_this_week">Esta semana</option>
+                        <option value="created_this_month">Este mes</option>
+                        <option value="created_this_year">Este año</option>
+                        <option value="created_older">Más antigua</option>
+                    </Form.Select>
+                    <hr />
+                    <Form.Label><strong>Estado:</strong></Form.Label>
+                    <Form.Select onChange={handleStatusSelect}>
+                        <option value="">Selecciona un estado</option>
+                        <option value="accepted">Aceptada</option>
+                        <option value="pending">Pendiente</option>
+                    </Form.Select>
+                </Form.Group>
+            </>
+        );
+    };
+
+    const dateFilter = (date, filter) => {
+        const currentDate = new Date();
+        const providedDate = new Date(date);
+        const timeDifference = currentDate - providedDate;
+
+        // Convertir la diferencia de tiempo a horas, días, meses y años
+        const hoursDifference = timeDifference / (1000 * 60 * 60);
+        const daysDifference = hoursDifference / 24;
+        const monthsDifference = daysDifference / 30.44; // Promedio de días por mes
+        const yearsDifference = daysDifference / 365.25; // Promedio de días por año
+
+        switch (filter) {
+            case 'created_recently':
+                return hoursDifference <= 1;
+            case 'created_today':
+                return daysDifference < 1;
+            case 'created_this_week':
+                return daysDifference < 7;
+            case 'created_this_month':
+                return monthsDifference < 1;
+            case 'created_this_year':
+                return yearsDifference < 1;
+            case 'created_older':
+                return yearsDifference >= 1;
+            default:
+                return true;
+        }
+    };
+
+
+    const filterFunction = (relation) => {
+        // Aplica el filtro de fecha de creación
+        if (!dateFilter(relation.created_at, selectedCreated)) {
+            return false;
+        }
+
+        // Aplica el filtro de fecha de modificación
+        if (!dateFilter(relation.updated_at, selectedModified)) {
+            return false;
+        }
+
+        // Aplica el filtro de autor
+        switch (selectedStatus) {
+            case 'pending':
+                if (relation.status === 'accepted') {
+                    return false;
+                }
+                break;
+            case 'accepted':
+                if (relation.status === 'pending') {
+                    return false;
+                }
+                break;
+            default:
+                break;
+        }
+
+        // Si todos los filtros se aplican correctamente, devuelve verdadero
+        return true;
+    };
+
     return (
         <>
             <CreateRelationModal
@@ -232,6 +353,10 @@ const AdminRelationsBoard = ({ users, relations }) => {
                 renderHeader={renderHeader}
                 renderRow={renderRow}
                 handleCreateModal={handleCreateModal}
+                page={"relaciones"}
+                searchFunction={searchFunction}
+                renderFilterOptions={renderFilterOptions}
+                filterFunction={filterFunction}
             />
         </>
     );

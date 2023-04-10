@@ -88,9 +88,9 @@ const CreateCollectionModal = ({ show, handleClose, handleCollectionCreate }) =>
     };
 
     return (
-        <Modal show={show} onHide={handleClose}>
+        <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Crear nueva nota</Modal.Title>
+                <Modal.Title>Crear nueva colección</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Container>

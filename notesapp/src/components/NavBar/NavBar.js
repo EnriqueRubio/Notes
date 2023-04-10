@@ -97,7 +97,7 @@ function NavBar({ onLogout }) {
                 id="navbarDropdownMenuLink"
               >
                 <NavDropdown.Item href="/profile">Perfil</NavDropdown.Item>
-                <NavDropdown.Item href="/settings">Ajustes</NavDropdown.Item>
+                {/* <NavDropdown.Item href="/settings">Ajustes</NavDropdown.Item> */}
                 <NavDropdown.Item href="/login" onClick={logOut}>
                   Logout
                 </NavDropdown.Item>

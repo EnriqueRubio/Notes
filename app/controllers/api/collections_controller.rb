@@ -34,7 +34,9 @@ def index
 
   # PATCH/PUT /collections/1
   def update
-    @collection.author = current_api_user.id
+    if !current_api_user.admin
+      @collection.author = current_api_user.id
+    end
 
     if @collection.update(collection_params)
       render json: @collection

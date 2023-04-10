@@ -131,7 +131,7 @@ const NoteEditModal = ({ show, handleClose, note, users, collections, handleNote
 
     return (
         <>
-            <Modal show={show} onHide={handleClose} size="lg">
+            <Modal show={show} onHide={handleClose} size="lg" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Editar nota</Modal.Title>
                 </Modal.Header>

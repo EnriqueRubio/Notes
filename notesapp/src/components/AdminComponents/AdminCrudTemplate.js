@@ -1,23 +1,30 @@
-import React, { useState } from 'react';
-import { Container, Col, Row, Form, FormControl, Button, Table, ButtonGroup, Pagination } from 'react-bootstrap';
-import { FaPlus, FaSortAlphaUp, FaSortAlphaDown } from 'react-icons/fa';
+import React, { useMemo, useState, useCallback } from 'react';
+import { Container, Col, Row, Form, FormControl, Button, Table, Pagination } from 'react-bootstrap';
+import { FaPlus } from 'react-icons/fa';
 import './AdminCrud.css';
 
-const AdminCrudTemplate = ({ items, renderHeader, renderRow, handleCreateModal }) => {
-    const [sortAscending, setSortAscending] = useState(true);
+const AdminCrudTemplate = ({ items, renderHeader, renderRow, handleCreateModal, page, searchFunction, renderFilterOptions, filterFunction }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [filter, setFilter] = useState('');
+
+    const applyFilters = useCallback((item) => {
+        if (filter === '') return true;
+        return filterFunction(item, filter);
+    }, [filter, filterFunction]);
+
+    const filteredItems = useMemo(() => items.filter(item => searchFunction(item, searchTerm) && filterFunction(item)), [items, searchTerm, searchFunction, filterFunction]);
 
     const itemsPerPage = 12;
-    const totalPages = Math.ceil(items.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const displayedItems = items.slice(startIndex, endIndex);
+    const displayedItems = filteredItems.slice(startIndex, endIndex);
 
-    const handleSearchChange = (event) => {
-        setSearchTerm(event.target.value);
-    };
+    // const handleSearchChange = (event) => {
+    //     setSearchTerm(event.target.value);
+    // };
 
     const handleSearchSubmit = (event) => {
         event.preventDefault();
@@ -25,29 +32,21 @@ const AdminCrudTemplate = ({ items, renderHeader, renderRow, handleCreateModal }
     };
 
     const handleFilterChange = (event) => {
-        // Lógica de filtrado aquí
+        setFilter(event.target.value);
     };
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
 
-    // Datos de ejemplo para las notas
-    const sampleNotes = ['Nota 1', 'Nota 2', 'Nota 3'];
-
-
     return (
         <>
             <Container fluid className="d-flex">
                 <Col className="custom-border" md={2} style={{ marginRight: "0.2rem" }}>
                     <Row className="mx-1">
-                        <Form.Group controlId="filter">
-                            <Form.Label>Filtrar por:</Form.Label>
-                            <Form.Select onChange={handleFilterChange}>
-                                <option value="">Selecciona un filtro</option>
-                                {/* Añade más opciones de filtro aquí */}
-                            </Form.Select>
-                        </Form.Group>
+                        <h3 style={{ textAlign: "center" }} >FILTROS</h3>
+                        <hr/>
+                        {renderFilterOptions()}
                     </Row>
                 </Col>
                 <Col className="custom-border" style={{ marginLeft: "0.2rem" }}>
@@ -56,12 +55,10 @@ const AdminCrudTemplate = ({ items, renderHeader, renderRow, handleCreateModal }
                             <Form onSubmit={handleSearchSubmit} className="d-flex">
                                 <FormControl
                                     type="search"
-                                    placeholder="Buscar notas"
+                                    placeholder={page ? "Buscar " + page : "Buscar"}
                                     value={searchTerm}
-                                    onChange={handleSearchChange}
-                                    style={{ marginRight: '1rem' }}
+                                    onChange={event => setSearchTerm(event.target.value)}
                                 />
-                                <Button className="ml-2" type="submit">Buscar</Button>
                             </Form>
                         </Col>
                     </Row>

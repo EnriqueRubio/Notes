@@ -84,7 +84,7 @@ const CreateRelationModal = ({ show, handleClose, handleRelationUpdate, handleRe
         <>
             <Modal show={show} onHide={handleClose} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Crear nueva amistad</Modal.Title>
+                    <Modal.Title>Editar amistad</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {error && <div style={errorStyle}>{error}</div>}

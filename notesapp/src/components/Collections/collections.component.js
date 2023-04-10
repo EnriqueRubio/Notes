@@ -641,7 +641,7 @@ const Collections = () => {
                         </Modal.Footer>
                     </Modal>
 
-                    <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                    <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
                         <Modal.Header closeButton>
                             <Modal.Title>Confirmar eliminación</Modal.Title>
                         </Modal.Header>
