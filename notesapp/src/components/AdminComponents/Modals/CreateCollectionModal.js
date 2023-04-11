@@ -90,7 +90,7 @@ const CreateCollectionModal = ({ show, handleClose, handleCollectionCreate }) =>
     return (
         <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Crear nueva colección</Modal.Title>
+                <Modal.Title>Create new collection</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Container>
@@ -98,10 +98,10 @@ const CreateCollectionModal = ({ show, handleClose, handleCollectionCreate }) =>
                         <Col md={6}>
                             <Form>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Título</Form.Label>
+                                    <Form.Label>Title</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Título de la colección"
+                                        placeholder="Collection title"
                                         onChange={handleInputChange('title')}
                                     />
                                 </Form.Group>
@@ -109,13 +109,13 @@ const CreateCollectionModal = ({ show, handleClose, handleCollectionCreate }) =>
                                     <Form.Label>Descripción</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Introduce la descripción"
+                                        placeholder="Collection description"
                                         onChange={handleInputChange('description')}
                                     />
                                 </Form.Group>
                                 <Row>
                                     <Col>
-                                        <Form.Label>Seleccione un tema:</Form.Label>
+                                        <Form.Label>Choose a theme:</Form.Label>
                                         <div>
                                             {predefinedThemes.map((theme, index) => (
                                                 <Button
@@ -130,7 +130,7 @@ const CreateCollectionModal = ({ show, handleClose, handleCollectionCreate }) =>
                                                     }}
                                                     onClick={() => handleThemeChange(index)}
                                                 >
-                                                    Tema {index + 1}
+                                                    Theme {index + 1}
                                                 </Button>
                                             ))}
                                         </div>
@@ -152,20 +152,20 @@ const CreateCollectionModal = ({ show, handleClose, handleCollectionCreate }) =>
                                         color: selectedTheme.textColor,
                                     }}
                                 >
-                                    <Card.Title>{title ? title : 'Título'}</Card.Title>
-                                    <Card.Text>{description ? description : 'Descripción'}</Card.Text>
+                                    <Card.Title>{title ? title : 'Title'}</Card.Title>
+                                    <Card.Text>{description ? description : 'Description'}</Card.Text>
                                 </Card.Body>
                                 <ListGroup className="list-group-flush">
-                                    <ListGroup.Item>Nota 1</ListGroup.Item>
-                                    <ListGroup.Item>Nota 2</ListGroup.Item>
-                                    <ListGroup.Item>Nota 3</ListGroup.Item>
+                                    <ListGroup.Item>Note 1</ListGroup.Item>
+                                    <ListGroup.Item>Note 2</ListGroup.Item>
+                                    <ListGroup.Item>Note 3</ListGroup.Item>
                                 </ListGroup>
                                 <Card.Body>
                                     <Button className="btn btn-outline-success" style={{ marginRight: '40px' }} disabled>
-                                        Compartir
+                                        Share
                                     </Button>
                                     <Button className="btn btn-outline-primary mr-2" disabled>
-                                        Editar
+                                        Edit
                                     </Button>
                                 </Card.Body>
                             </Card>
@@ -175,10 +175,10 @@ const CreateCollectionModal = ({ show, handleClose, handleCollectionCreate }) =>
             </Modal.Body >
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>
-                    Cancelar
+                    Cancel
                 </Button>
                 <Button variant="primary" onClick={handleSubmit}>
-                    Crear
+                    Create
                 </Button>
             </Modal.Footer>
         </Modal >

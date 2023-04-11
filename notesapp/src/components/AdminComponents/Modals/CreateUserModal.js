@@ -39,7 +39,7 @@ const CreateUserModal = ({ show, handleClose, handleUserCreate }) => {
     return (
         <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Crear nuevo usuario</Modal.Title>
+                <Modal.Title>Create new user</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form>
@@ -58,13 +58,13 @@ const CreateUserModal = ({ show, handleClose, handleUserCreate }) => {
                     <Row>
                         <Col>
                             <Form.Group className="mb-3">
-                                <Form.Label>Nombre de usuario</Form.Label>
+                                <Form.Label>Username</Form.Label>
                                 <Form.Control
                                     type="text"
                                     className='form-control'
                                     value={username}
                                     name='username'
-                                    placeholder="Nombre de usuario"
+                                    placeholder="Username"
                                     onChange={(e) => setUsername(e.target.value)}
                                     validations={[required]}
                                 />
@@ -83,7 +83,7 @@ const CreateUserModal = ({ show, handleClose, handleUserCreate }) => {
                         </Col>
                     </Row>
                     <Form.Group className="mb-3">
-                        <Form.Label>Contraseña</Form.Label>
+                        <Form.Label>Password</Form.Label>
                         <Form.Control
                             type='password'
                             name='password'
@@ -98,10 +98,10 @@ const CreateUserModal = ({ show, handleClose, handleUserCreate }) => {
 
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>
-                    Cancelar
+                    Cancel
                 </Button>
                 <Button variant="primary" onClick={handleSubmit}>
-                    Crear
+                    Create
                 </Button>
             </Modal.Footer>
             {message && (

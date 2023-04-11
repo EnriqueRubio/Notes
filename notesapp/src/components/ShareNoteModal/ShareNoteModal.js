@@ -35,7 +35,7 @@ const ShareNoteModal = ({ show, onHide, friends, sharedFriends, updateSharedItem
         <Modal show={show} onHide={onHide} centered>
 
             <Modal.Header closeButton>
-                <Modal.Title>Compartir {itemType} "<strong>{item ? item.title : ""}</strong>"</Modal.Title>
+                <Modal.Title>Share {itemType} "<strong>{item ? item.title : ""}</strong>"</Modal.Title>
             </Modal.Header>
 
             {item ? (
@@ -44,19 +44,19 @@ const ShareNoteModal = ({ show, onHide, friends, sharedFriends, updateSharedItem
                         <Modal.Body>
                             <Row className="mt-3">
                                 <h5 className="shared-by-message">
-                                    Compartido contigo por{" "}
-                                    {author ? author.username : "Nombre del amigo no disponible"}
+                                    Shared with you by {" "}
+                                    {author ? author.username : "Friend name not found"}
                                 </h5>
                             </Row>
                             <Row className="mt-3">
                                 <div style={{ textAlign: "center" }} >
-                                    Sólo {author.username} puede compartir esta {itemType}.
+                                    Only {author.username} can share this {itemType}.
                                 </div>
                             </Row>
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="primary" onClick={onHide}>
-                                Aceptar
+                                Accept
                             </Button>
                         </Modal.Footer>
                     </div>
@@ -65,14 +65,14 @@ const ShareNoteModal = ({ show, onHide, friends, sharedFriends, updateSharedItem
                         <Modal.Body>
                             <Form.Control
                                 type="text"
-                                placeholder="Buscar amigos"
+                                placeholder="Search friends"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
 
                             <Row className="mt-3">
                                 <Col style={{ minWidth: '10rem', maxWidth: '15rem' }}>
-                                    <h5>Amigos</h5>
+                                    <h5>Friends</h5>
                                     <div style={{ minHeight: '15rem', maxHeight: '25rem', overflowY: 'auto' }}>
                                         <ListGroup className="scrollbar-primary">
                                             {filteredFriends.map((friend) => {
@@ -104,7 +104,7 @@ const ShareNoteModal = ({ show, onHide, friends, sharedFriends, updateSharedItem
                                     </div>
                                 </Col>
                                 <Col>
-                                    <h5>Compartido con</h5>
+                                    <h5>Shared to</h5>
                                     <div style={{ minHeight: '15rem', maxHeight: '25rem', overflowY: 'auto' }}>
                                         <ListGroup>
                                             {localSharedFriends.map((friend) => (
@@ -132,10 +132,10 @@ const ShareNoteModal = ({ show, onHide, friends, sharedFriends, updateSharedItem
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary" onClick={onHide}>
-                                Cancelar
+                                Cancel
                             </Button>
                             <Button variant="primary" onClick={() => handleAccept()}>
-                                Aceptar
+                                Accept
                             </Button>
                         </Modal.Footer>
                     </div>

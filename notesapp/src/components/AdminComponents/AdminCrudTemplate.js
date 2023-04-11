@@ -44,7 +44,7 @@ const AdminCrudTemplate = ({ items, renderHeader, renderRow, handleCreateModal, 
             <Container fluid className="d-flex">
                 <Col className="custom-border" md={2} style={{ marginRight: "0.2rem" }}>
                     <Row className="mx-1">
-                        <h3 style={{ textAlign: "center" }} >FILTROS</h3>
+                        <h3 style={{ textAlign: "center" }} >FILTERS</h3>
                         <hr/>
                         {renderFilterOptions()}
                     </Row>
@@ -55,7 +55,7 @@ const AdminCrudTemplate = ({ items, renderHeader, renderRow, handleCreateModal, 
                             <Form onSubmit={handleSearchSubmit} className="d-flex">
                                 <FormControl
                                     type="search"
-                                    placeholder={page ? "Buscar " + page : "Buscar"}
+                                    placeholder={page ? "Search " + page : "Search..."}
                                     value={searchTerm}
                                     onChange={event => setSearchTerm(event.target.value)}
                                 />

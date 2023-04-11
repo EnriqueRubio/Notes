@@ -21,19 +21,19 @@ function Toolbar({
     };
 
     const sortCriteriaLabels = {
-        created: 'Fecha de creación',
-        modified: 'Fecha de modificación',
-        title: 'Título',
+        created: 'Created',
+        modified: 'Updated',
+        title: 'Title',
     };
 
     const filterDateLabels = {
-        ever: 'Siempre',
-        recently: 'Recientes',
-        today: 'Hoy',
-        this_week: 'Esta semana',
-        this_month: 'Este mes',
-        this_year: 'Este año',
-        older: 'Más antiguas',
+        ever: 'Ever',
+        recently: 'Recent',
+        today: 'Today',
+        this_week: 'This week',
+        this_month: 'This month',
+        this_year: 'This year',
+        older: 'Older',
     };
 
     return (
@@ -64,7 +64,7 @@ function Toolbar({
                     }}
                 >
                     <Dropdown.Toggle variant="dark" id="dropdown-basic" className="mx-2">
-                        {selectedCollections.length > 0 ? `${selectedCollections.length} Colección(es)` : 'Colección'}
+                        {selectedCollections.length > 0 ? `${selectedCollections.length} Colection(s)` : 'Collection'}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         <Dropdown.Item
@@ -72,7 +72,7 @@ function Toolbar({
                             eventKey=""
                             active={selectedCollections.length === 0}
                         >
-                            Todas
+                            All
                         </Dropdown.Item>
                         {collections.map((collection) => (
                             <Dropdown.Item
@@ -104,11 +104,11 @@ function Toolbar({
                     }}
                 >
                     <Dropdown.Toggle variant="dark" id="dropdown-basic" className="mx-2">
-                        {selectedFriends.length > 0 ? `${selectedFriends.length} Amigo(s)` : 'Compartidas'}
+                        {selectedFriends.length > 0 ? `${selectedFriends.length} Friend(s)` : 'Shared with'}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         <Dropdown.Item key="all" eventKey="" active={selectedFriends.length === 0}>
-                            Todos
+                            All
                         </Dropdown.Item>
                         {friends.map((friend) => (
                             <Dropdown.Item
@@ -124,7 +124,7 @@ function Toolbar({
 
                 <Dropdown onSelect={(value) => setSelectedDate(value)}>
                     <Dropdown.Toggle variant="dark" id="dropdown-basic" className="mx-2">
-                        {filterDateLabels[selectedDate] || 'Fecha'}
+                        {filterDateLabels[selectedDate] || 'Date'}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         <Dropdown.Item
@@ -132,49 +132,49 @@ function Toolbar({
                             eventKey="ever"
                             style={selectedDate === 'ever' ? { backgroundColor: '#4285F4', fontWeight: "bold" } : {}}
                         >
-                            Siempre
+                            Ever
                         </Dropdown.Item>
                         <Dropdown.Item
                             key="recently"
                             eventKey="recently"
                             style={selectedDate === 'recently' ? { backgroundColor: '#4285F4', fontWeight: "bold" } : {}}
                         >
-                            Recientes
+                            Recent
                         </Dropdown.Item>
                         <Dropdown.Item
                             key="today"
                             eventKey="today"
                             style={selectedDate === 'today' ? { backgroundColor: '#4285F4', fontWeight: "bold" } : {}}
                         >
-                            Hoy
+                            Today
                         </Dropdown.Item>
                         <Dropdown.Item
                             key="this_week"
                             eventKey="this_week"
                             style={selectedDate === 'this_week' ? { backgroundColor: '#4285F4', fontWeight: "bold" } : {}}
                         >
-                            Esta semana
+                            This week
                         </Dropdown.Item>
                         <Dropdown.Item
                             key="this_month"
                             eventKey="this_month"
                             style={selectedDate === 'this_month' ? { backgroundColor: '#4285F4', fontWeight: "bold" } : {}}
                         >
-                            Este mes
+                            This month
                         </Dropdown.Item>
                         <Dropdown.Item
                             key="this_year"
                             eventKey="this_year"
                             style={selectedDate === 'this_year' ? { backgroundColor: '#4285F4', fontWeight: "bold" } : {}}
                         >
-                            Este año
+                            This year
                         </Dropdown.Item>
                         <Dropdown.Item
                             key="older"
                             eventKey="older"
                             style={selectedDate === 'older' ? { backgroundColor: '#4285F4', fontWeight: "bold" } : {}}
                         >
-                            Más antiguas
+                            Older
                         </Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
@@ -183,7 +183,7 @@ function Toolbar({
             <div className="sorting d-flex">
                 <Dropdown onSelect={(value) => setSortCriteria(value)}>
                     <Dropdown.Toggle variant="dark" id="dropdown-basic" className="mx-2">
-                        {sortCriteriaLabels[sortCriteria] || 'Ordenar por'}
+                        {sortCriteriaLabels[sortCriteria] || 'Order by'}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         <Dropdown.Item

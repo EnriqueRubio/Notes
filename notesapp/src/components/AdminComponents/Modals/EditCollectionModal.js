@@ -104,7 +104,7 @@ const EditCollectionModal = ({ show, handleClose, handleCollectionUpdate, handle
         <>
             <Modal show={show} onHide={handleClose} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Editar colección</Modal.Title>
+                    <Modal.Title>Edit collection</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Container>
@@ -112,7 +112,7 @@ const EditCollectionModal = ({ show, handleClose, handleCollectionUpdate, handle
                             <Col md={6}>
                                 <Form>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Título</Form.Label>
+                                        <Form.Label>Title</Form.Label>
                                         <Form.Control
                                             type="text"
                                             placeholder={collection ? collection.title : ''}
@@ -120,7 +120,7 @@ const EditCollectionModal = ({ show, handleClose, handleCollectionUpdate, handle
                                         />
                                     </Form.Group>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Descripción</Form.Label>
+                                        <Form.Label>Description</Form.Label>
                                         <Form.Control
                                             type="text"
                                             placeholder={collection ? collection.description : ''}
@@ -129,7 +129,7 @@ const EditCollectionModal = ({ show, handleClose, handleCollectionUpdate, handle
                                     </Form.Group>
                                     <Row>
                                         <Col>
-                                            <Form.Label>Seleccione un tema:</Form.Label>
+                                            <Form.Label>Choose a theme:</Form.Label>
                                             <div>
                                                 {predefinedThemes.map((theme, index) => (
                                                     <Button
@@ -144,7 +144,7 @@ const EditCollectionModal = ({ show, handleClose, handleCollectionUpdate, handle
                                                         }}
                                                         onClick={() => handleThemeChange(index)}
                                                     >
-                                                        Tema {index + 1}
+                                                        Theme {index + 1}
                                                     </Button>
                                                 ))}
                                             </div>
@@ -170,16 +170,16 @@ const EditCollectionModal = ({ show, handleClose, handleCollectionUpdate, handle
                                         <Card.Text>{description ? description : 'Descripción'}</Card.Text>
                                     </Card.Body>
                                     <ListGroup className="list-group-flush">
-                                        <ListGroup.Item>Nota 1</ListGroup.Item>
-                                        <ListGroup.Item>Nota 2</ListGroup.Item>
-                                        <ListGroup.Item>Nota 3</ListGroup.Item>
+                                        <ListGroup.Item>Note 1</ListGroup.Item>
+                                        <ListGroup.Item>Note 2</ListGroup.Item>
+                                        <ListGroup.Item>Note 3</ListGroup.Item>
                                     </ListGroup>
                                     <Card.Body>
                                         <Button className="btn btn-outline-success" style={{ marginRight: '40px' }} disabled>
-                                            Compartir
+                                            Share
                                         </Button>
                                         <Button className="btn btn-outline-primary mr-2" disabled>
-                                            Editar
+                                            Edit
                                         </Button>
                                     </Card.Body>
                                 </Card>
@@ -189,30 +189,30 @@ const EditCollectionModal = ({ show, handleClose, handleCollectionUpdate, handle
                 </Modal.Body >
                 <Modal.Footer>
                     <Button variant="danger" onClick={() => setShowDeleteModal(true)} style={{ marginRight: 'auto' }} >
-                        Eliminar
+                        Delete
                     </Button>
                     <Button variant="secondary" onClick={handleClose}>
-                        Cancelar
+                        Cancel
                     </Button>
                     <Button variant="primary" onClick={handleSubmit}>
-                        Guardar cambios
+                        Save changes
                     </Button>
                 </Modal.Footer>
             </Modal >
 
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Confirmar eliminación</Modal.Title>
+                    <Modal.Title>Confirm</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    ¿Estás seguro de que deseas eliminar esta colección?
+                    Are you sure you want to remove this collection?
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                        Cancelar
+                        Cancel
                     </Button>
                     <Button variant="danger" onClick={() => handleDeleteNote()}>
-                        Eliminar
+                        Delete
                     </Button>
                 </Modal.Footer>
             </Modal>

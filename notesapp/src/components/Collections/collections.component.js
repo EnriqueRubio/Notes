@@ -516,7 +516,7 @@ const Collections = () => {
                                             ))
                                         ) : (
                                             <ListGroup.Item style={{ backgroundColor: '#e2e3e5', color: '#6c757d', fontStyle: 'italic', height: '100%' }}>
-                                                Esta colección está vacía
+                                                This collection is empty
                                             </ListGroup.Item>
                                         )}
                                     </ListGroup>
@@ -539,12 +539,12 @@ const Collections = () => {
                         sharedFriends={sharedFriends}
                         updateSharedItem={handleShare}
                         item={collectionToShare}
-                        itemType='colección'
+                        itemType='collection'
                     />
 
                     <Modal show={showModal} onHide={handleClose} centered>
                         <Modal.Header closeButton>
-                            <Modal.Title>{editingCollection ? "Editar colección" : "Crear nueva colección"}</Modal.Title>
+                            <Modal.Title>{editingCollection ? "Edit collection" : "Create collection"}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             <Container>
@@ -552,34 +552,34 @@ const Collections = () => {
                                     <Col md={6}>
                                         <Form>
                                             <Form.Group controlId="formBasicTitle">
-                                                <Form.Label>Título</Form.Label>
+                                                <Form.Label>Title</Form.Label>
                                                 <Form.Control
                                                     type="text"
-                                                    placeholder="Introduce el título"
-                                                    value={title ? title : (editingCollection ? editingCollection.title : 'Título')}
+                                                    placeholder="Enter title"
+                                                    value={title ? title : (editingCollection ? editingCollection.title : 'Title')}
                                                     onChange={handleInputChange('title')}
                                                 />
                                             </Form.Group>
 
                                             <Form.Group controlId="formBasicDescription">
-                                                <Form.Label>Descripción</Form.Label>
+                                                <Form.Label>Description</Form.Label>
                                                 <Form.Control
                                                     type="text"
-                                                    placeholder="Introduce la descripción"
-                                                    value={description ? description : (editingCollection ? editingCollection.description : 'Descripción')}
+                                                    placeholder="Enter description"
+                                                    value={description ? description : (editingCollection ? editingCollection.description : 'Description')}
                                                     onChange={handleInputChange('description')}
                                                 />
                                             </Form.Group>
 
                                             <Row>
                                                 <Col>
-                                                    <Form.Label>Seleccione un tema:</Form.Label>
+                                                    <Form.Label>Choose a theme:</Form.Label>
                                                     <div>
                                                         {predefinedThemes.map((theme, index) => (
                                                             <Button
                                                                 key={index}
                                                                 style={{
-                                                                    width: '95px',
+                                                                    width: '96px',
                                                                     backgroundColor: theme.bgColor,
                                                                     borderColor: theme.borderColor,
                                                                     color: theme.textColor,
@@ -588,7 +588,7 @@ const Collections = () => {
                                                                 }}
                                                                 onClick={() => handleThemeChange(index)}
                                                             >
-                                                                Tema {index + 1}
+                                                                Theme {index + 1}
                                                             </Button>
                                                         ))}
                                                     </div>
@@ -610,20 +610,20 @@ const Collections = () => {
                                                     color: selectedTheme.textColor,
                                                 }}
                                             >
-                                                <Card.Title>{title ? title : (editingCollection ? editingCollection.title : 'Título')}</Card.Title>
-                                                <Card.Text>{description ? description : (editingCollection ? editingCollection.description : 'Descripción')}</Card.Text>
+                                                <Card.Title>{title ? title : (editingCollection ? editingCollection.title : 'Title')}</Card.Title>
+                                                <Card.Text>{description ? description : (editingCollection ? editingCollection.description : 'Description')}</Card.Text>
                                             </Card.Body>
                                             <ListGroup className="list-group-flush">
-                                                <ListGroup.Item>Nota 1</ListGroup.Item>
-                                                <ListGroup.Item>Nota 2</ListGroup.Item>
-                                                <ListGroup.Item>Nota 3</ListGroup.Item>
+                                                <ListGroup.Item>Note 1</ListGroup.Item>
+                                                <ListGroup.Item>Note 2</ListGroup.Item>
+                                                <ListGroup.Item>Note 3</ListGroup.Item>
                                             </ListGroup>
                                             <Card.Body>
                                                 <Button className="btn btn-outline-success" style={{ marginRight: '40px' }} disabled>
-                                                    Compartir
+                                                    Share
                                                 </Button>
                                                 <Button className="btn btn-outline-primary mr-2" disabled>
-                                                    Editar
+                                                    Edit
                                                 </Button>
                                             </Card.Body>
                                         </Card>
@@ -633,49 +633,49 @@ const Collections = () => {
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary" onClick={handleClose}>
-                                Cancelar
+                                Cancel
                             </Button>
                             <Button variant="primary" onClick={handleCreateOrUpdateCollection}>
-                                Guardar
+                                Save
                             </Button>
                         </Modal.Footer>
                     </Modal>
 
                     <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
                         <Modal.Header closeButton>
-                            <Modal.Title>Confirmar eliminación</Modal.Title>
+                            <Modal.Title>Confirm</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            ¿Estás seguro de que deseas eliminar esta colección?
+                            Are you sure you want to delete this collection?
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                                Cancelar
+                                Cancel
                             </Button>
                             <Button variant="danger" onClick={() => handleDeleteCollection(collectionToDelete)}>
-                                Eliminar
+                                Delete
                             </Button>
                         </Modal.Footer>
                     </Modal>
 
                     <Modal dialogClassName="custom-modal-dialog" show={showNoteModal} onHide={() => setShowNoteModal(false)} centered>
                         <Modal.Header closeButton>
-                            <Modal.Title>Editar nota</Modal.Title>
+                            <Modal.Title>Edit note</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             <Form>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Título</Form.Label>
+                                    <Form.Label>Title</Form.Label>
                                     <Form.Control
                                         type="text"
                                         id="noteTitle"
-                                        placeholder="Título de la nota"
+                                        placeholder="Note title"
                                         defaultValue={selectedNote?.title || ''}
                                         onChange={handleNoteInputChange('noteTitle')}
                                     />
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Contenido</Form.Label>
+                                    <Form.Label>Content</Form.Label>
                                     <QuillEditor
                                         onEditorReady={handleEditorReady}
                                         getCurrentContent={getCurrentEditingNoteContent}
@@ -696,30 +696,30 @@ const Collections = () => {
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary" onClick={() => setShowNoteModal(false)}>
-                                Cerrar
+                                Close
                             </Button>
                             <Button variant="danger" onClick={() => handleDeleteNoteModal(selectedNote)}>
-                                Eliminar
+                                Delete
                             </Button>
                             <Button variant="success" onClick={() => handleSaveChanges(selectedNote)}>
-                                Guardar cambios
+                                Save Changes
                             </Button>
                         </Modal.Footer>
                     </Modal>
 
                     <Modal show={showDeleteNoteModal} onHide={() => setShowDeleteNoteModal(false)}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Confirmar eliminación</Modal.Title>
+                            <Modal.Title>Confirm</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            ¿Estás seguro de que deseas eliminar esta colección?
+                            Are you sure you want to remove this note?
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary" onClick={() => setShowDeleteNoteModal(false)}>
-                                Cancelar
+                                Cancel
                             </Button>
                             <Button variant="danger" onClick={() => handleDeleteNote(noteToDelete)}>
-                                Eliminar
+                                Delete
                             </Button>
                         </Modal.Footer>
                     </Modal>
@@ -731,7 +731,7 @@ const Collections = () => {
             ) : (
                 // Renderiza un mensaje de error o redirecciona al usuario
                 <h1>
-                    No tienes permiso para ver esta página, por favor inicia sesión.
+                    You have no permission to access this page.
                 </h1>
             )}
         </>

@@ -42,7 +42,7 @@ const NoteEditModal = ({ show, handleClose, note, users, collections, handleNote
         if (user) {
             setAuthorId(user._id.$oid);
         } else {
-            alert('Usuario no encontrado');
+            alert('User not found');
         }
     };
 
@@ -88,7 +88,7 @@ const NoteEditModal = ({ show, handleClose, note, users, collections, handleNote
     const renderCollectionsDropdown = () => (
         <Dropdown>
             <Dropdown.Toggle variant="secondary" id="dropdown-collections">
-                Colecciones
+                Collections
             </Dropdown.Toggle>
             <Dropdown.Menu>
                 {collections.map((collection) => (
@@ -110,7 +110,7 @@ const NoteEditModal = ({ show, handleClose, note, users, collections, handleNote
     const renderSharedUsersDropdown = () => (
         <Dropdown>
             <Dropdown.Toggle variant="secondary" id="dropdown-shared-users">
-                Compartir
+                Share
             </Dropdown.Toggle>
             <Dropdown.Menu>
                 {users.map((user) => (
@@ -133,12 +133,12 @@ const NoteEditModal = ({ show, handleClose, note, users, collections, handleNote
         <>
             <Modal show={show} onHide={handleClose} size="lg" centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Editar nota</Modal.Title>
+                    <Modal.Title>Edit note</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Form.Group className="mb-3">
-                            <Form.Label>Título</Form.Label>
+                            <Form.Label>Title</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder={note ? note.title : ''}
@@ -146,23 +146,23 @@ const NoteEditModal = ({ show, handleClose, note, users, collections, handleNote
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
-                            <Form.Label>Contenido</Form.Label>
+                            <Form.Label>Content</Form.Label>
                             <QuillEditor
                                 onEditorReady={handleEditorReady}
                                 getCurrentContent={getCurrentEditingNoteContent}
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
-                            <Form.Label>Cambiar autor</Form.Label>
+                            <Form.Label>Change author</Form.Label>
                             <InputGroup>
                                 <FormControl
                                     type="email"
-                                    placeholder="Correo electrónico del autor"
+                                    placeholder="Author email"
                                     value={searchedEmail}
                                     onChange={(e) => setSearchedEmail(e.target.value)}
                                 />
                                 <Button variant="outline-secondary" onClick={() => handleAuthorSearch(searchedEmail)}>
-                                    Buscar
+                                    Search
                                 </Button>
                             </InputGroup>
                         </Form.Group>
@@ -179,13 +179,13 @@ const NoteEditModal = ({ show, handleClose, note, users, collections, handleNote
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="danger" onClick={() => setShowDeleteModal(true)} style={{ marginRight: 'auto' }} >
-                        Eliminar
+                        Remove
                     </Button>
                     <Button variant="secondary" onClick={handleClose}>
-                        Cancelar
+                        Cancel
                     </Button>
                     <Button variant="primary" onClick={handleSubmit}>
-                        Guardar cambios
+                        Save changes
                     </Button>
                 </Modal.Footer>
             </Modal>
@@ -193,17 +193,17 @@ const NoteEditModal = ({ show, handleClose, note, users, collections, handleNote
 
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Confirmar eliminación</Modal.Title>
+                    <Modal.Title>Confirm</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    ¿Estás seguro de que deseas eliminar esta nota?
+                    Are you sure you want to remove this note?
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                        Cancelar
+                        Cancel
                     </Button>
                     <Button variant="danger" onClick={() => handleDeleteNote()}>
-                        Eliminar
+                        Delete
                     </Button>
                 </Modal.Footer>
             </Modal>
