@@ -229,19 +229,19 @@ const AdminNotesBoard = ({ notes, collections, users }) => {
     const renderHeader = () => (
         <tr>
             <th className="custom-th sortable-th" onClick={() => handleSort('title')}>
-                Título {renderSortIcon('title')}
+                Title {renderSortIcon('title')}
             </th>
             <th className="custom-th sortable-th" onClick={() => handleSort('created_at')}>
-                Fecha creación {renderSortIcon('created_at')}
+                Creation date {renderSortIcon('created_at')}
             </th>
             <th className="custom-th sortable-th" onClick={() => handleSort('updated_at')}>
-                Fecha modif. {renderSortIcon('updated_at')}
+                Update date {renderSortIcon('updated_at')}
             </th>
             <th className="custom-th sortable-th" onClick={() => handleSort('author_id')}>
-                Autor {renderSortIcon('author_id')}
+                Author {renderSortIcon('author_id')}
             </th>
-            <th className="custom-th">Colecciones</th>
-            <th className="custom-th">Compartidos</th>
+            <th className="custom-th">Collections</th>
+            <th className="custom-th">Shared to</th>
         </tr>
     );
 
@@ -368,24 +368,24 @@ const AdminNotesBoard = ({ notes, collections, users }) => {
                 <Form.Group controlId="filter">
                     <Form.Label><strong>Fecha de creación:</strong></Form.Label>
                     <Form.Select onChange={handleCreatedSelect}>
-                        <option value="">Selecciona un rango</option>
-                        <option value="created_recently">Reciente</option>
-                        <option value="created_today">Hoy</option>
-                        <option value="created_this_week">Esta semana</option>
-                        <option value="created_this_month">Este mes</option>
-                        <option value="created_this_year">Este año</option>
-                        <option value="created_older">Más antigua</option>
+                        <option value="">Select a range</option>
+                        <option value="created_recently">Recent</option>
+                        <option value="created_today">Today</option>
+                        <option value="created_this_week">This week</option>
+                        <option value="created_this_month">This month</option>
+                        <option value="created_this_year">This year</option>
+                        <option value="created_older">Older</option>
                     </Form.Select>
                     <hr />
                     <Form.Label><strong>Fecha de modif.:</strong></Form.Label>
                     <Form.Select onChange={handleModifiedSelect}>
-                        <option value="">Selecciona un rango</option>
-                        <option value="created_recently">Reciente</option>
-                        <option value="created_today">Hoy</option>
-                        <option value="created_this_week">Esta semana</option>
-                        <option value="created_this_month">Este mes</option>
-                        <option value="created_this_year">Este año</option>
-                        <option value="created_older">Más antigua</option>
+                    <option value="">Select a range</option>
+                        <option value="updated_recently">Recent</option>
+                        <option value="updated_today">Today</option>
+                        <option value="updated_this_week">This week</option>
+                        <option value="updated_this_month">This month</option>
+                        <option value="updated_this_year">This year</option>
+                        <option value="updated_older">Older</option>
                     </Form.Select>
                     <hr />
                     <Form.Label><strong>Autor:</strong></Form.Label>
@@ -394,7 +394,7 @@ const AdminNotesBoard = ({ notes, collections, users }) => {
                         onChange={handleUserSelect}
                         isMulti
                         isSearchable
-                        placeholder="Buscar usuario"
+                        placeholder="Search user"
                         className="mb-2"
                     />
                     <hr />
@@ -404,7 +404,7 @@ const AdminNotesBoard = ({ notes, collections, users }) => {
                         onChange={handleCollectionSelect}
                         isMulti
                         isSearchable
-                        placeholder="Buscar colec..."
+                        placeholder="Search colec..."
                         className="mb-2"
                     />
                     <hr />
@@ -414,7 +414,7 @@ const AdminNotesBoard = ({ notes, collections, users }) => {
                         onChange={handleSharedSelect}
                         isMulti
                         isSearchable
-                        placeholder="Buscar comp..."
+                        placeholder="Search comp..."
                         className="mb-2"
                     />
                 </Form.Group>
@@ -503,7 +503,7 @@ const AdminNotesBoard = ({ notes, collections, users }) => {
                 renderHeader={renderHeader}
                 renderRow={renderRow}
                 handleCreateModal={handleCreateModal}
-                page={"notas"}
+                page={"notes"}
                 searchFunction={searchFunction}
                 renderFilterOptions={renderFilterOptions}
                 filterFunction={filterFunction}

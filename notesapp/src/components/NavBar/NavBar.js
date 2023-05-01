@@ -38,24 +38,24 @@ function NavBar({ onLogout }) {
           <Nav className="me-auto mb-2 mb-lg-0">
             <Nav.Item>
               <NavLink to={currentUser.admin ? "/admin/notes" : "/"} exact activeClassName="active" className="nav-link">
-                Notas
+                Notes
               </NavLink>
             </Nav.Item>
             <Nav.Item>
               <NavLink to={currentUser.admin ? "/admin/collections" : "/collections"} activeClassName="active" className="nav-link">
-                Colecciones
+                Collections
               </NavLink>
             </Nav.Item>
             {currentUser?.admin && (
               <>
                 <Nav.Item>
                   <NavLink to="/admin/users" activeClassName="active" className="nav-link">
-                    Usuarios
+                    Users
                   </NavLink>
                 </Nav.Item>
                 <Nav.Item>
                   <NavLink to="/admin/relations" activeClassName="active" className="nav-link">
-                    Relaciones
+                    Relations
                   </NavLink>
                 </Nav.Item>
               </>
@@ -87,7 +87,7 @@ function NavBar({ onLogout }) {
                 }
                 id="navbarDropdownMenuLink"
               >
-                <NavDropdown.Item href="/profile">Perfil</NavDropdown.Item>
+                <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
                 {/* <NavDropdown.Item href="/settings">Ajustes</NavDropdown.Item> */}
                 <NavDropdown.Item href="/login" onClick={logOut}>
                   Logout

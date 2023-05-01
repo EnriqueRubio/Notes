@@ -66,16 +66,16 @@ function reinicioValidaciones() {
 function notification(action) {
   switch (action) {
     case 1:
-      notification_title = "Nota Creada"
-      notification_content = "La nota se ha creado correctamente."
+      notification_title = "Note Created"
+      notification_content = "The note has been successfully created."
       break;
     case 2:
-      notification_title = "Nota Actualizada"
-      notification_content = "La nota se ha actualizado correctamente."
+      notification_title = "Nota Updated"
+      notification_content = "The note has been successfully updated."
       break;
     case 3:
-      notification_title = "Nota Borrada"
-      notification_content = "La nota se ha borrado correctamente."
+      notification_title = "Nota Deleted"
+      notification_content = "The note has been successfully deleted."
       break;
     default:
     //Nothing
@@ -112,6 +112,7 @@ const NoteContainer = () => {
   const [selectedDate, setSelectedDate] = useState('ever');
   const [sortCriteria, setSortCriteria] = useState('created');
   const [sortAscending, setSortAscending] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const navigate = useNavigate();
 
@@ -473,7 +474,6 @@ const NoteContainer = () => {
         );
       });
     }
-    
 
     if (selectedDate !== null) {
       // Aplica el filtro de fecha
@@ -503,6 +503,19 @@ const NoteContainer = () => {
 
     setFilteredNotes(filteredNotes);
   };
+
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredNotes(notes);
+    } else {
+      const searchLower = searchTerm.toLowerCase();
+      setFilteredNotes(
+        notes.filter((note) =>
+          note.title.toLowerCase().includes(searchLower)
+        )
+      );
+    }
+  }, [searchTerm, notes]);
 
   const sortNotes = () => {
     const sortedNotes = [...filteredNotes];
@@ -560,6 +573,7 @@ const NoteContainer = () => {
             setSelectedDate={setSelectedDate}
             setSortCriteria={setSortCriteria}
             setSortAscending={setSortAscending}
+            setSearchTerm={setSearchTerm}
             sortAscending={sortAscending}
             friends={friends}
             collections={collections}
@@ -567,6 +581,7 @@ const NoteContainer = () => {
             selectedDate={selectedDate}
             selectedFriends={selectedFriends}
             selectedCollections={selectedCollections}
+            searchTerm={searchTerm}
           />
 
 
@@ -580,7 +595,7 @@ const NoteContainer = () => {
 
                   <div class="modal-header">
                     <h1 class="modal-title fs-5" id="createModalLabel">
-                      Título:
+                      Title:
                       <input id="createNoteTitle" type="text" defaultValue="" placeholder='Titulo' style={{ marginLeft: "5px", borderTop: "none", borderLeft: "none", borderRight: "none", width: "400px" }} />
                     </h1>
 
@@ -595,12 +610,12 @@ const NoteContainer = () => {
                   </div>
 
                   <div id="validacionCrear" style={{ display: "none" }} class="alert alert-warning" role="alert">
-                    Debes rellenar todos los campos.
+                    You must fill all the fields.
                   </div>
 
                   <div class="modal-footer">
-                    <button id="btnCreateClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-outline-success" onClick={handlerCreateNote}>Crear Nota</button>
+                    <button id="btnCreateClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-success" onClick={handlerCreateNote}>Create note</button>
                   </div>
 
                 </div>
@@ -616,7 +631,7 @@ const NoteContainer = () => {
                   {note.author_id.$oid !== currentUser._id.$oid && (
                     <div class="shared-note-icon">
                       <div class="shared-note-icon-inner">
-                      <BsPersonFill color="white" size="1.5rem" />
+                        <BsPersonFill color="white" size="1.5rem" />
                       </div>
                     </div>
                   )}
@@ -660,7 +675,7 @@ const NoteContainer = () => {
                                     backgroundColor: "transparent",
                                     pointerEvents: "none",
                                   }}
-                                >No hay colecciones</Dropdown.Item>}
+                                >There are no collections</Dropdown.Item>}
                               </Dropdown.Menu>
                             </Dropdown>
                           </div>
@@ -701,7 +716,7 @@ const NoteContainer = () => {
                   <div class="modal-body card-text" id="viewNoteContent"></div>
 
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                   </div>
 
                 </div>
@@ -716,7 +731,7 @@ const NoteContainer = () => {
 
                   <div class="modal-header">
                     <h1 class="modal-title fs-5" id="editModalLabel">
-                      Editar Nota:
+                      Edit Note:
                       <input id="updateNoteTitle" type="text" defaultValue="test" style={{ marginLeft: "5px", borderTop: "none", borderLeft: "none", borderRight: "none", width: "400px" }} />
                     </h1>
 
@@ -734,12 +749,12 @@ const NoteContainer = () => {
                   </div>
 
                   <div id="validacionEdit" style={{ display: "none" }} class="alert alert-warning" role="alert">
-                    Debes rellenar todos los campos.
+                    You must fill all the fields.
                   </div>
 
                   <div class="modal-footer">
-                    <button id="btnUpdateClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-outline-success" onClick={handlerEditNote}>Actualizar Nota</button>
+                    <button id="btnUpdateClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-success" onClick={handlerEditNote}>Update Note</button>
                   </div>
 
                 </div>
@@ -755,7 +770,7 @@ const NoteContainer = () => {
               sharedFriends={sharedFriends}
               updateSharedItem={updateSharedNote}
               item={noteToShare}
-              itemType='nota'
+              itemType='note'
             />
 
             {/* Modal para borrar la nota */}
@@ -765,15 +780,15 @@ const NoteContainer = () => {
                 <div class="modal-content">
 
                   <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="deleteNoteTitle">¡Cuidado!</h1>
+                    <h1 class="modal-title fs-5" id="deleteNoteTitle">Watch out!</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
 
-                  <div class="modal-body" id="deleteNoteContent">Estas a punto de borrar tu nota, ¿Estás seguro de hacerlo?</div>
+                  <div class="modal-body" id="deleteNoteContent">The note will be deleted, are you sure you want to do it?</div>
 
                   <div class="modal-footer">
-                    <button id="btnDeleteClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" onClick={handlerDeleteNote}>Borrar Nota</button>
+                    <button id="btnDeleteClose" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onClick={handlerDeleteNote}>Delete Note</button>
                   </div>
 
                 </div>
@@ -788,7 +803,7 @@ const NoteContainer = () => {
       ) : (
         // Renderiza un mensaje de error o redirecciona al usuario
         <h1>
-          No tienes permiso para ver esta página, por favor inicia sesión.
+          You don't have permission to view this page. Please log in or sign up.
         </h1>
       )}
     </>

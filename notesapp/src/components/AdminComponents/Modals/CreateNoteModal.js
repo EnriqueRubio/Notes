@@ -29,21 +29,21 @@ const CreateNoteModal = ({ show, handleClose, handleNoteCreate }) => {
     return (
         <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Crear nueva nota</Modal.Title>
+                <Modal.Title>Create new note</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form>
                     <Form.Group className="mb-3">
-                        <Form.Label>Título</Form.Label>
+                        <Form.Label>Title</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Título de la nota"
+                            placeholder="Note title"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                         />
                     </Form.Group>
                     <Form.Group className="mb-3">
-                        <Form.Label>Contenido</Form.Label>
+                        <Form.Label>Content</Form.Label>
                         <QuillEditor
                             onEditorReady={handleEditorReady}
                             getCurrentContent={getCurrentEditingNoteContent}
@@ -53,10 +53,10 @@ const CreateNoteModal = ({ show, handleClose, handleNoteCreate }) => {
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>
-                    Cancelar
+                    Cancel
                 </Button>
                 <Button variant="primary" onClick={handleSubmit}>
-                    Crear
+                    Create
                 </Button>
             </Modal.Footer>
         </Modal>

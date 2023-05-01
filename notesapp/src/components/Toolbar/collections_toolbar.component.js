@@ -1,23 +1,21 @@
-import { Dropdown, ButtonGroup, Button, Form, FormControl } from 'react-bootstrap';
+import { Dropdown, ButtonGroup, Button, Form, FormControl, Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaSortAlphaDown, FaSortAlphaUp } from 'react-icons/fa';
 
 function Toolbar({
-    setSelectedCollections,
     setSelectedFriends,
     setSelectedDate,
     setSortCriteria,
     setSortAscending,
     sortAscending,
     setSearchTerm,
-    collections,
     friends,
     sortCriteria,
     selectedDate,
     selectedFriends,
-    selectedCollections,
-    searchTerm
+    searchTerm,
 }) {
+
     const handleSortDirection = () => {
         setSortAscending(!sortAscending);
     };
@@ -45,52 +43,6 @@ function Toolbar({
         >
             <div className="row">
                 <div className="filters d-flex col">
-                    <Dropdown
-                        onSelect={(collectionId) => {
-                            if (collectionId === '') {
-                                setSelectedCollections([]);
-                                return;
-                            }
-                            const existingIndex = selectedCollections.findIndex(
-                                (collection) => collection._id.$oid === collectionId
-                            );
-
-                            if (existingIndex > -1) {
-                                // Si la colección ya está seleccionada, elimínala del array
-                                const updatedCollections = [...selectedCollections];
-                                updatedCollections.splice(existingIndex, 1);
-                                setSelectedCollections(updatedCollections);
-                            } else {
-                                // Si la colección no está seleccionada, agrégala al array
-                                const selected = collections.find(
-                                    (collection) => collection._id.$oid === collectionId
-                                );
-                                setSelectedCollections([...selectedCollections, selected]);
-                            }
-                        }}
-                    >
-                        <Dropdown.Toggle variant="dark" id="dropdown-basic" className="mx-2">
-                            {selectedCollections.length > 0 ? `${selectedCollections.length} Colection(s)` : 'Collection'}
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                            <Dropdown.Item
-                                key="all"
-                                eventKey=""
-                                active={selectedCollections.length === 0}
-                            >
-                                All
-                            </Dropdown.Item>
-                            {collections.map((collection) => (
-                                <Dropdown.Item
-                                    key={collection._id.$oid}
-                                    eventKey={collection._id.$oid}
-                                    active={selectedCollections.some((selected) => selected._id.$oid === collection._id.$oid)}
-                                >
-                                    {collection.title}
-                                </Dropdown.Item>
-                            ))}
-                        </Dropdown.Menu>
-                    </Dropdown>
 
                     <Dropdown
                         onSelect={(friendId) => {
@@ -188,7 +140,7 @@ function Toolbar({
                     <Form className="d-flex" style={{ flexGrow: 1 }}>
                         <FormControl
                             type="search"
-                            placeholder="Search by note title"
+                            placeholder="Search by collection title"
                             value={searchTerm}
                             onChange={(event) => setSearchTerm(event.target.value)}
                         />

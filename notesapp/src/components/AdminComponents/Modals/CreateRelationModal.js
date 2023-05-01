@@ -75,7 +75,7 @@ const CreateRelationModal = ({ show, handleClose, handleRelationCreate, relation
     return (
         <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Crear nueva amistad</Modal.Title>
+                <Modal.Title>Create new friendship</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {error && <div style={errorStyle}>{error}</div>}
@@ -83,24 +83,24 @@ const CreateRelationModal = ({ show, handleClose, handleRelationCreate, relation
                     <Row>
                         <Col className="d-flex justify-content-center">
                             <div className="d-flex flex-column align-items-center">
-                                <Form.Label>Estado</Form.Label>
+                                <Form.Label>Status</Form.Label>
                                 <Dropdown>
                                     <Dropdown.Toggle variant="secondary" id="dropdown-shared-users">
                                         {status.charAt(0).toUpperCase() + status.slice(1)}
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu>
-                                        <Dropdown.Item onClick={() => setStatus('pending')}>Pendiente</Dropdown.Item>
-                                        <Dropdown.Item onClick={() => setStatus('accepted')}>Aceptada</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => setStatus('pending')}>Pending</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => setStatus('accepted')}>Accepted</Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
                             </div>
                         </Col>
                         <Col className="d-flex justify-content-center">
                             <div className="d-flex flex-column align-items-center">
-                                <Form.Label>Emisor</Form.Label>
+                                <Form.Label>Sender</Form.Label>
                                 <Dropdown>
                                     <Dropdown.Toggle variant="secondary" id="dropdown-shared-users">
-                                        {sender_id.username ? sender_id.username : 'Elegir emisor'}
+                                        {sender_id.username ? sender_id.username : 'Choose sender'}
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu style={{ maxHeight: '200px', overflow: 'auto' }}>
                                         {localUsers?.map((user) => (
@@ -120,10 +120,10 @@ const CreateRelationModal = ({ show, handleClose, handleRelationCreate, relation
                         </Col>
                         <Col className="d-flex justify-content-center">
                             <div className="d-flex flex-column align-items-center">
-                                <Form.Label>Receptor</Form.Label>
+                                <Form.Label>Receiver</Form.Label>
                                 <Dropdown>
                                     <Dropdown.Toggle variant="secondary" id="dropdown-shared-users">
-                                        {receiver_id.username ? receiver_id.username : 'Elegir receptor'}
+                                        {receiver_id.username ? receiver_id.username : 'Choose receiver'}
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu style={{ maxHeight: '200px', overflow: 'auto' }}>
                                         {localUsers?.map((user) => (
@@ -146,10 +146,10 @@ const CreateRelationModal = ({ show, handleClose, handleRelationCreate, relation
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>
-                    Cancelar
+                    Cancel
                 </Button>
                 <Button variant="primary" onClick={handleSubmit}>
-                    Crear
+                    Create
                 </Button>
             </Modal.Footer>
         </Modal>

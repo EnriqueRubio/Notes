@@ -185,7 +185,7 @@ class Register extends Component {
                 <div className="form-group">
                   <button className="btn btn-primary btn-block">Sign Up</button>
                   <div className="text-right mt-2">
-                    <Link to="/login">¿Ya tienes cuenta? Inicia sesión!</Link>
+                    <Link to="/login">Do you have an accout? Log in!</Link>
                   </div>
                 </div>
               </div>
@@ -216,7 +216,7 @@ class Register extends Component {
           {this.state.successful && (
         <div className="form-group">
           <Link to="/login" className="btn btn-primary btn-block">
-            Iniciar sesión
+            Log  in
           </Link>
         </div>
       )}

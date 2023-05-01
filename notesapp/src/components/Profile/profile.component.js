@@ -145,8 +145,6 @@ const UserProfile = () => {
       updatedValues.password = passwordRef.current.value;
     }
   
-    console.log("Valores actualizados:", updatedValues);
-  
     axios.put(`${API_URL}${currentUser._id.$oid}`, 
       updatedValues,
       {
@@ -200,7 +198,7 @@ const UserProfile = () => {
         }}
       >
         {isAdmin ? <FaCrown style={{marginRight: '5px'}} /> : <FaUser style={{marginRight: '5px'}} />}
-        {isAdmin ? 'Administrador' : 'Usuario'}
+        {isAdmin ? 'Admin' : 'User'}
       </div>
     );
   }
@@ -212,7 +210,7 @@ const UserProfile = () => {
         <Col md={6}>
           <Card>
             <Card.Header className="text-center">
-              <h3>Información del perfil</h3>
+              <h3>Profile info</h3>
             </Card.Header>
             <Card.Body>
               <Form onSubmit={handleSubmit}>
@@ -226,7 +224,7 @@ const UserProfile = () => {
                     />
                     <OverlayTrigger
                       placement="top"
-                      overlay={<Tooltip id="avatar-tooltip">Click para cambiar avatar</Tooltip>}
+                      overlay={<Tooltip id="avatar-tooltip">Click to change avatar</Tooltip>}
                       trigger={['hover', 'focus']}
                     >
                       {({ ref, ...triggerHandler }) => (
@@ -244,21 +242,21 @@ const UserProfile = () => {
                 </Form.Group>
                 {/* Nombre de usuario */}
                 <Form.Group controlId="username">
-                  <Form.Label className="text-center" style={{ width: '100%', textAlign: 'center' }}>Nombre de usuario</Form.Label>
-                  <Form.Control className="text-center" type="text" placeholder={user ? user.username : 'Cargando...'} disabled={!isEditing} ref={usernameRef} />
+                  <Form.Label className="text-center" style={{ width: '100%', textAlign: 'center' }}>Username</Form.Label>
+                  <Form.Control className="text-center" type="text" placeholder={user ? user.username : 'Loading...'} disabled={!isEditing} ref={usernameRef} />
                 </Form.Group>
 
                 {/* Email */}
                 <Form.Group controlId="email">
                   <Form.Label className="text-center" style={{ width: '100%', textAlign: 'center' }}>Email</Form.Label>
-                  <Form.Control className="text-center" type="email" placeholder={user ? user.email : 'Cargando...'} disabled={!isEditing} ref={emailRef} />
+                  <Form.Control className="text-center" type="email" placeholder={user ? user.email : 'Loading...'} disabled={!isEditing} ref={emailRef} />
                 </Form.Group>
 
                 {/* Contraseña */}
                 {isEditing && (
                   <Form.Group controlId="password">
-                    <Form.Label className="text-center" style={{ width: '100%', textAlign: 'center' }}>Contraseña</Form.Label>
-                    <Form.Control className="text-center" type="password" placeholder="Contraseña" ref={passwordRef} />
+                    <Form.Label className="text-center" style={{ width: '100%', textAlign: 'center' }}>Password</Form.Label>
+                    <Form.Control className="text-center" type="password" placeholder="Password" ref={passwordRef} />
                   </Form.Group>
                 )}
 
@@ -267,21 +265,21 @@ const UserProfile = () => {
                   <Form.Label className="text-center" style={{ width: '100%', textAlign: 'center' }}>Rol</Form.Label>
                   <Form.Control
                     as="select"
-                    value={user ? (user.admin? 'Administrador' : 'Usuario') : "cargando"}
+                    value={user ? (user.admin? 'Admin' : 'User') : "Loading..."}
                     disabled={true}
                   >
-                    <option className="text-center">Usuario</option>
-                    <option className="text-center">Administrador</option>
+                    <option className="text-center">User</option>
+                    <option className="text-center">Admin</option>
                   </Form.Control>
                 </Form.Group>
 
                 <div className="d-flex justify-content-center mt-2">
                   <Button variant="primary" onClick={handleEditClick} style={{ marginRight: '8px' }}> 
-                    {isEditing ? 'Cancelar' : 'Editar'}
+                    {isEditing ? 'Cancel' : 'Edit'}
                   </Button>
                   {isEditing && (
                     <Button type="submit" variant="success">
-                      Guardar
+                      Save
                     </Button>
                   )}
                 </div>
@@ -294,17 +292,17 @@ const UserProfile = () => {
         <Col md={6}>
         <Card className="mb-3" style={{ height: '260px' }}>
           <Card.Header className="text-center">
-            <h3>Más información</h3>
+            <h3>More info</h3>
           </Card.Header>
           <Card.Body>
             <Row>
               <Col className="d-flex flex-column align-items-center justify-content-center">
-                <p><strong>Usuario desde</strong> {user ? formatDate(user.created_at) : 'Cargando...'}</p>
-                <p style={{marginTop: '50px'}}><strong>Nº de notas:</strong> {number_of_notes ? number_of_notes : '0'}</p>
+                <p><strong>User since</strong> {user ? formatDate(user.created_at) : 'Cargando...'}</p>
+                <p style={{marginTop: '50px'}}><strong>Notes:</strong> {number_of_notes ? number_of_notes : '0'}</p>
               </Col>
               <Col className="d-flex flex-column align-items-center justify-content-center">
                 <UserRole isAdmin={user ? user.admin : false} />
-                <p style={{marginTop: '50px'}} ><strong>Nº de colecciones:</strong> {number_of_collections ? number_of_collections : '0'}</p>
+                <p style={{marginTop: '50px'}} ><strong>Collections:</strong> {number_of_collections ? number_of_collections : '0'}</p>
               </Col>
             </Row>
           </Card.Body>
@@ -312,11 +310,10 @@ const UserProfile = () => {
 
           <Card className="mt-1">
             <Card.Header className="text-center">
-              <h3>Amigos ({friends.length})</h3>
+              <h3>Friends ({friends.length})</h3>
             </Card.Header>
             <Card.Body>
               <ListGroup style={{ maxHeight: '160px', overflowY: 'auto' }}>
-                {/* Aquí puedes mapear los amigos del usuario y mostrar cada uno como un elemento de la lista */}
                 {friends.map((friend) => (
                   <ListGroup.Item className="text-center">{friend.user.username} ({friend.user.email})</ListGroup.Item>
                 ))}

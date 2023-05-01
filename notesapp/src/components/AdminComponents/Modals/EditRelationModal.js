@@ -62,9 +62,7 @@ const CreateRelationModal = ({ show, handleClose, handleRelationUpdate, handleRe
             setReceiver_id({ id: '', username: '' });
             handleClose();
         } else {
-            // Muestra un mensaje de error o realiza otra acción si no se cumplen las condiciones
-            console.log("Emisor y receptor deben ser diferentes y no tener una relación existente");
-            setError("Emisor y receptor deben ser diferentes y no tener una relación existente");
+            setError("Sender and receiver must be different users and can't already have a relation");
         }
     };
 
@@ -84,7 +82,7 @@ const CreateRelationModal = ({ show, handleClose, handleRelationUpdate, handleRe
         <>
             <Modal show={show} onHide={handleClose} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Editar amistad</Modal.Title>
+                    <Modal.Title>Edit friendship</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {error && <div style={errorStyle}>{error}</div>}
@@ -92,34 +90,34 @@ const CreateRelationModal = ({ show, handleClose, handleRelationUpdate, handleRe
                         <Row>
                             <Col className="d-flex justify-content-center">
                                 <div className="d-flex flex-column align-items-center">
-                                    <Form.Label>Estado</Form.Label>
+                                    <Form.Label>Status</Form.Label>
                                     <Dropdown>
                                         <Dropdown.Toggle variant="secondary" id="dropdown-shared-users">
                                             {status.charAt(0).toUpperCase() + status.slice(1)}
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
-                                            <Dropdown.Item onClick={() => setStatus('pending')}>Pendiente</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => setStatus('accepted')}>Aceptada</Dropdown.Item>
+                                            <Dropdown.Item onClick={() => setStatus('pending')}>Pending</Dropdown.Item>
+                                            <Dropdown.Item onClick={() => setStatus('accepted')}>Accepted</Dropdown.Item>
                                         </Dropdown.Menu>
                                     </Dropdown>
                                 </div>
                             </Col>
                             <Col className="d-flex justify-content-center">
                                 <div className="d-flex flex-column align-items-center">
-                                    <Form.Label>Emisor</Form.Label>
+                                    <Form.Label>Sender</Form.Label>
                                     <Dropdown disabled>
                                         <Dropdown.Toggle variant="secondary" id="dropdown-shared-users" disabled>
-                                            {sender_id.username ? sender_id.username : 'Elegir emisor'}
+                                            {sender_id.username ? sender_id.username : 'Choose sender'}
                                         </Dropdown.Toggle>
                                     </Dropdown>
                                 </div>
                             </Col>
                             <Col className="d-flex justify-content-center">
                                 <div className="d-flex flex-column align-items-center">
-                                    <Form.Label>Receptor</Form.Label>
+                                    <Form.Label>Receiver</Form.Label>
                                     <Dropdown disabled>
                                         <Dropdown.Toggle variant="secondary" id="dropdown-shared-users" disabled>
-                                            {receiver_id.username ? receiver_id.username : 'Elegir receptor'}
+                                            {receiver_id.username ? receiver_id.username : 'Choose receiver'}
                                         </Dropdown.Toggle>
                                     </Dropdown>
                                 </div>
@@ -140,30 +138,30 @@ const CreateRelationModal = ({ show, handleClose, handleRelationUpdate, handleRe
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="danger" onClick={() => setShowDeleteModal(true)} style={{ marginRight: 'auto' }} >
-                        Eliminar
+                        Delete
                     </Button>
                     <Button variant="secondary" onClick={handleClose}>
-                        Cancelar
+                        Cancel
                     </Button>
                     <Button variant="primary" onClick={handleSubmit}>
-                        Crear
+                        Create
                     </Button>
                 </Modal.Footer>
             </Modal>
 
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Confirmar eliminación</Modal.Title>
+                    <Modal.Title>Confirm</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    ¿Estás seguro de que deseas eliminar esta relación?
+                    Are you sure you want to remove this relation?
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                        Cancelar
+                        Cancel
                     </Button>
                     <Button variant="danger" onClick={() => handleDeleteRelation()}>
-                        Eliminar
+                        Delete
                     </Button>
                 </Modal.Footer>
             </Modal>

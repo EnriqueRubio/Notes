@@ -114,14 +114,14 @@ const Login = (props) => {
                 <span>Login</span>
               </button>
               <div className='text-right mt-2'>
-                <Link to='/register'>¿No tienes una cuenta? ¡Crea una!</Link>
+                <Link to='/register'>Don't you have an account? Create one!</Link>
               </div>
             </div>
   
             {message && (
               <div className='form-group'>
                 <div className='alert alert-danger' role='alert'>
-                  {message} // Cambiar "this.state.message" a "message"
+                  {message} // Change "this.state.message" to "message"
                 </div>
               </div>
             )}

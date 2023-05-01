@@ -93,7 +93,7 @@ const EditUserModal = ({ show, handleClose, handleUserUpdate, handleUserDelete, 
         <>
             <Modal show={show} onHide={handleClose} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Editar usuario {user ? "(" + user.username + ")" : ""}</Modal.Title>
+                    <Modal.Title>Edit user {user ? "(" + user.username + ")" : ""}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
@@ -106,7 +106,7 @@ const EditUserModal = ({ show, handleClose, handleUserUpdate, handleUserDelete, 
                                 />
                                 <OverlayTrigger
                                     placement="top"
-                                    overlay={<Tooltip id="avatar-tooltip">Click para cambiar avatar</Tooltip>}
+                                    overlay={<Tooltip id="avatar-tooltip">Click to change avatar</Tooltip>}
                                     trigger={['hover', 'focus']}
                                 >
                                     {({ ref, ...triggerHandler }) => (
@@ -136,7 +136,7 @@ const EditUserModal = ({ show, handleClose, handleUserUpdate, handleUserDelete, 
                         <Row>
                             <Col>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Nombre de usuario</Form.Label>
+                                    <Form.Label>Username</Form.Label>
                                     <Form.Control
                                         type="text"
                                         className='form-control'
@@ -160,7 +160,7 @@ const EditUserModal = ({ show, handleClose, handleUserUpdate, handleUserDelete, 
                             </Col>
                         </Row>
                         <Form.Group className="mb-3">
-                            <Form.Label>Contraseña</Form.Label>
+                            <Form.Label>Password</Form.Label>
                             <Form.Control
                                 type='password'
                                 name='password'
@@ -175,13 +175,13 @@ const EditUserModal = ({ show, handleClose, handleUserUpdate, handleUserDelete, 
 
                 <Modal.Footer>
                     <Button variant="danger" onClick={() => setShowDeleteModal(true)} style={{ marginRight: 'auto' }} >
-                        Eliminar
+                        Delete
                     </Button>
                     <Button variant="secondary" onClick={handleClose}>
-                        Cancelar
+                        Cancel
                     </Button>
                     <Button variant="primary" onClick={handleSubmit}>
-                        Guardar cambios
+                        Save Changes
                     </Button>
                 </Modal.Footer>
                 {message && (
@@ -195,17 +195,17 @@ const EditUserModal = ({ show, handleClose, handleUserUpdate, handleUserDelete, 
 
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Confirmar eliminación</Modal.Title>
+                    <Modal.Title>Confirm</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    ¿Estás seguro de que deseas eliminar este usuario?
+                    Are you sure you want to remove this user?
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                        Cancelar
+                        Cancel
                     </Button>
                     <Button variant="danger" onClick={() => handleDeleteUser()}>
-                        Eliminar
+                        Delete
                     </Button>
                 </Modal.Footer>
             </Modal>

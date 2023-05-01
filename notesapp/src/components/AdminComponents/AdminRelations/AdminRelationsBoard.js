@@ -75,19 +75,19 @@ const AdminRelationsBoard = ({ users, relations }) => {
     const renderHeader = () => (
         <tr>
             <th className="custom-th sortable-th" onClick={() => handleSort('sender_id')}>
-                Emisor {renderSortIcon('sender_id')}
+                Sender {renderSortIcon('sender_id')}
             </th>
             <th className="custom-th sortable-th" onClick={() => handleSort('receiver_id')}>
-                Receptor {renderSortIcon('receiver_id')}
+                Receiver {renderSortIcon('receiver_id')}
             </th>
             <th className="custom-th sortable-th" onClick={() => handleSort('status')}>
-                Estado {renderSortIcon('status')}
+                Status {renderSortIcon('status')}
             </th>
             <th className="custom-th sortable-th" onClick={() => handleSort('created_at')}>
-                Fecha de petición {renderSortIcon('created_at')}
+                Request date {renderSortIcon('created_at')}
             </th>
             <th className="custom-th sortable-th" onClick={() => handleSort('updated_at')}>
-                Última modificación {renderSortIcon('updated_at')}
+                Last update {renderSortIcon('updated_at')}
             </th>
         </tr>
     );
@@ -236,33 +236,33 @@ const AdminRelationsBoard = ({ users, relations }) => {
         return (
             <>
                 <Form.Group controlId="filter">
-                    <Form.Label><strong>Fecha de creación:</strong></Form.Label>
+                    <Form.Label><strong>Creation date:</strong></Form.Label>
                     <Form.Select onChange={handleCreatedSelect}>
-                        <option value="">Selecciona un rango</option>
-                        <option value="created_recently">Reciente</option>
-                        <option value="created_today">Hoy</option>
-                        <option value="created_this_week">Esta semana</option>
-                        <option value="created_this_month">Este mes</option>
-                        <option value="created_this_year">Este año</option>
-                        <option value="created_older">Más antigua</option>
+                        <option value="">Select a range</option>
+                        <option value="created_recently">Recent</option>
+                        <option value="created_today">Today</option>
+                        <option value="created_this_week">This week</option>
+                        <option value="created_this_month">This month</option>
+                        <option value="created_this_year">This year</option>
+                        <option value="created_older">Older</option>
                     </Form.Select>
                     <hr />
                     <Form.Label><strong>Fecha de modif.:</strong></Form.Label>
                     <Form.Select onChange={handleModifiedSelect}>
-                        <option value="">Selecciona un rango</option>
-                        <option value="created_recently">Reciente</option>
-                        <option value="created_today">Hoy</option>
-                        <option value="created_this_week">Esta semana</option>
-                        <option value="created_this_month">Este mes</option>
-                        <option value="created_this_year">Este año</option>
-                        <option value="created_older">Más antigua</option>
+                    <option value="">Select a range</option>
+                        <option value="updated_recently">Recent</option>
+                        <option value="updated_today">Today</option>
+                        <option value="updated_this_week">This week</option>
+                        <option value="updated_this_month">This month</option>
+                        <option value="updated_this_year">This year</option>
+                        <option value="updated_older">Older</option>
                     </Form.Select>
                     <hr />
-                    <Form.Label><strong>Estado:</strong></Form.Label>
+                    <Form.Label><strong>Status:</strong></Form.Label>
                     <Form.Select onChange={handleStatusSelect}>
-                        <option value="">Selecciona un estado</option>
-                        <option value="accepted">Aceptada</option>
-                        <option value="pending">Pendiente</option>
+                        <option value="">Choose a status</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="pending">Pending</option>
                     </Form.Select>
                 </Form.Group>
             </>
@@ -353,7 +353,7 @@ const AdminRelationsBoard = ({ users, relations }) => {
                 renderHeader={renderHeader}
                 renderRow={renderRow}
                 handleCreateModal={handleCreateModal}
-                page={"relaciones"}
+                page={"relations"}
                 searchFunction={searchFunction}
                 renderFilterOptions={renderFilterOptions}
                 filterFunction={filterFunction}

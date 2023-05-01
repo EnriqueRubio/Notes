@@ -1,0 +1,8 @@
+.toolbar {
+    display: flex;
+    align-items: stretch;
+}
+
+.filters {
+    display: flex;
+}

@@ -30,24 +30,24 @@ function dateFormat(fecha, formato) {
 function notification(action, user) {
     switch (action) {
         case 1:
-            notification_title = "Amigo Añadido"
-            notification_content = user + " y tú ahora sois amigos."
+            notification_title = "Friend added"
+            notification_content = user + " and you are now friends."
             break;
         case 2:
-            notification_title = "Amigo elminado"
-            notification_content = "Ya no eres amigo de " + user + "."
+            notification_title = "Friend deleted"
+            notification_content = user + " is no longer your friend."
             break;
         case 3:
-            notification_title = "Solicitud de amistad enviada"
-            notification_content = "La solicitud de amistad ha sido enviada a " + user + "."
+            notification_title = "Friendship request sent"
+            notification_content = "The request has been sent to " + user + "."
             break;
         case 4:
-            notification_title = "Solicitud de amistad cancelada"
-            notification_content = "La solicitud de amistad a " + user + " ha sido cancelada."
+            notification_title = "Friendship request cancelled"
+            notification_content = "The friendship request for " + user + " has been canceled."
             break;
         case 5:
-            notification_title = "Solicitud de amistad rechazada"
-            notification_content = "La solicitud de amistad de " + user + " ha sido rechazada."
+            notification_title = "Friendship request rejected"
+            notification_content = user + "'s request has been rejected."
             break;
         default:
         //Nothing
@@ -240,7 +240,6 @@ const FriendsSidebar = () => {
                 setSearchResults(response.data); // Asegura que searchResults sea un array
             }
         } catch (error) {
-            console.error('Error al buscar usuarios:', error);
         }
     };
 
@@ -259,11 +258,11 @@ const FriendsSidebar = () => {
             </div>
             <Button variant="info" className="toggle-sidebar" onClick={handleShow}>
 
-                <span className="vertical-text">Amigos</span>
+                <span className="vertical-text">Friends</span>
             </Button>
             <Offcanvas show={show} onHide={handleClose} placement="end">
                 <Offcanvas.Header closeButton>
-                    <Offcanvas.Title>Amigos</Offcanvas.Title>
+                    <Offcanvas.Title>Friends</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
 
@@ -271,7 +270,7 @@ const FriendsSidebar = () => {
 
                     <Accordion defaultActiveKey={['0']} alwaysOpen>
                         <Accordion.Item eventKey="0">
-                            <Accordion.Header><b>Amigos</b></Accordion.Header>
+                            <Accordion.Header><b>Friends</b></Accordion.Header>
                             <Accordion.Body>
                                 {friends.map((friend, index) => (
                                     <div
@@ -295,7 +294,7 @@ const FriendsSidebar = () => {
                             </Accordion.Body>
                         </Accordion.Item>
                         <Accordion.Item eventKey="1">
-                            <Accordion.Header><b>Peticiones entrantes</b></Accordion.Header>
+                            <Accordion.Header><b>Incoming requests</b></Accordion.Header>
                             <Accordion.Body>
                                 {iFriends.map((iFriend, index) => (
                                     <div
@@ -338,7 +337,7 @@ const FriendsSidebar = () => {
                             </Accordion.Body>
                         </Accordion.Item>
                         <Accordion.Item eventKey="3">
-                            <Accordion.Header><b>Peticiones salientes</b></Accordion.Header>
+                            <Accordion.Header><b>Outgoing requests</b></Accordion.Header>
                             <Accordion.Body>
                                 {oFriends.map((oFriend, index) => (
                                     <div
@@ -369,13 +368,13 @@ const FriendsSidebar = () => {
                             <div className="input-group">
                                 <Form.Control
                                     type="text"
-                                    placeholder="Buscar usuarios"
+                                    placeholder="Search users"
                                     value={searchValue}
                                     onChange={handleSearchChange}
                                 />
                                 <div className="input-group-append">
                                     <Button variant="primary" onClick={handleSearch}>
-                                        Buscar
+                                        Search
                                     </Button>
                                 </div>
                             </div>
@@ -412,17 +411,17 @@ const FriendsSidebar = () => {
 
                     <Modal show={ShowDeleteModal} onHide={() => setShowDeleteModal(false)}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Eliminar amigo</Modal.Title>
+                            <Modal.Title>Remove friend</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            ¿Seguro que deseas eliminar a <b>{selectedFriend?.user.username}</b> de tus amigos?
+                            Are you sure you want to delete <b>{selectedFriend?.user.username}</b> as your friend?
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                                Cancelar
+                                Cancel
                             </Button>
                             <Button variant="danger" onClick={() => handleDeleteFriend("deleteFriend", selectedFriend)}>
-                                Eliminar
+                                Delete
                             </Button>
                         </Modal.Footer>
                     </Modal>
