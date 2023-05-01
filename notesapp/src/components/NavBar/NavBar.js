@@ -73,15 +73,6 @@ function NavBar({ onLogout }) {
           )}
 
           {currentUser?.admin == false && (<>
-            <Form className="d-flex" role="search">
-              <FormControl
-                type="search"
-                placeholder="Buscar"
-                className="me-2"
-                aria-label="Search"
-              />
-              <Button type="submit">Buscar</Button>
-            </Form>
             <Nav>
               <NavDropdown
                 title={
