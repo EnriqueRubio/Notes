@@ -112,6 +112,7 @@ const NoteContainer = () => {
   const [selectedDate, setSelectedDate] = useState('ever');
   const [sortCriteria, setSortCriteria] = useState('created');
   const [sortAscending, setSortAscending] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const navigate = useNavigate();
 
@@ -474,7 +475,6 @@ const NoteContainer = () => {
       });
     }
 
-
     if (selectedDate !== null) {
       // Aplica el filtro de fecha
       const now = new Date();
@@ -503,6 +503,19 @@ const NoteContainer = () => {
 
     setFilteredNotes(filteredNotes);
   };
+
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredNotes(notes);
+    } else {
+      const searchLower = searchTerm.toLowerCase();
+      setFilteredNotes(
+        notes.filter((note) =>
+          note.title.toLowerCase().includes(searchLower)
+        )
+      );
+    }
+  }, [searchTerm, notes]);
 
   const sortNotes = () => {
     const sortedNotes = [...filteredNotes];
@@ -560,6 +573,7 @@ const NoteContainer = () => {
             setSelectedDate={setSelectedDate}
             setSortCriteria={setSortCriteria}
             setSortAscending={setSortAscending}
+            setSearchTerm={setSearchTerm}
             sortAscending={sortAscending}
             friends={friends}
             collections={collections}
@@ -567,6 +581,7 @@ const NoteContainer = () => {
             selectedDate={selectedDate}
             selectedFriends={selectedFriends}
             selectedCollections={selectedCollections}
+            searchTerm={searchTerm}
           />
 
 

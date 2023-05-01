@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import TwitterPicker from 'react-color';
 import axios from 'axios';
 import "./collections.component.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -25,6 +24,7 @@ import AuthHeader from "../../services/auth-header";
 import FriendsSidebar from '../FriendsSidebar/FriendsSidebar';
 import QuillEditor from '../Editor/editor.component';
 import ShareNoteModal from '../ShareNoteModal/ShareNoteModal';
+import Toolbar from '../Toolbar/collections_toolbar.component';
 
 const BASE_API_URL = "http://localhost:3000/api/";
 const API_URL_COLLECTIONS = BASE_API_URL + "collections/";
@@ -56,6 +56,13 @@ const Collections = () => {
     const [quillInstance, setQuillInstance] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [currentEditingNote, setCurrentEditingNote] = useState('');
+    // Filtering and sorting states
+    const [filteredCollections, setFilteredCollections] = useState([]);
+    const [selectedFriends, setSelectedFriends] = useState([]);
+    const [selectedDate, setSelectedDate] = useState('ever');
+    const [sortCriteria, setSortCriteria] = useState('created');
+    const [sortAscending, setSortAscending] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleEditorReady = (quill) => {
         setQuillInstance(quill);
@@ -458,13 +465,124 @@ const Collections = () => {
         setShowModal(false);
     };
 
+    // Filtering and sorting functions
+
+    const applyFilters = () => {
+        let filteredCollections = collections;
+
+        if (selectedFriends.length > 0) {
+            // Aplica el filtro de amigos
+            filteredCollections = filteredCollections.filter((note) => {
+                return (
+                    // Notas compartidas por el usuario actual con amigos seleccionados
+                    note.shared_to_ids.some((idObj) =>
+                        selectedFriends.some((friend) => friend._id.$oid === idObj.$oid)
+                    ) ||
+                    // Notas compartidas por amigos con el usuario actual y donde el autor es alguno de los amigos seleccionados
+                    selectedFriends.some((friend) => friend._id.$oid === note.author_id.$oid) &&
+                    note.shared_to_ids.some((idObj) => idObj.$oid === currentUser._id.$oid)
+                );
+            });
+        }
+
+        if (selectedDate !== null) {
+            // Aplica el filtro de fecha
+            const now = new Date();
+            filteredCollections = filteredCollections.filter((note) => {
+                const createdAt = new Date(note.created_at);
+                const timeDiff = now - createdAt;
+
+                switch (selectedDate) {
+                    case 'recently':
+                        return timeDiff <= 60 * 60 * 1000; // Menos de una hora
+                    case 'today':
+                        return timeDiff <= 24 * 60 * 60 * 1000; // Menos de un día
+                    case 'this_week':
+                        return timeDiff <= 7 * 24 * 60 * 60 * 1000; // Menos de una semana
+                    case 'this_month':
+                        return timeDiff <= 30 * 24 * 60 * 60 * 1000; // Menos de un mes
+                    case 'this_year':
+                        return timeDiff <= 365 * 24 * 60 * 60 * 1000; // Menos de un año
+                    case 'older':
+                        return timeDiff > 365 * 24 * 60 * 60 * 1000; // Más de un año
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        setFilteredCollections(filteredCollections);
+    };
+
+    useEffect(() => {
+        if (searchTerm.trim() === '') {
+            setFilteredCollections(collections);
+        } else {
+            const searchLower = searchTerm.toLowerCase();
+            setFilteredCollections(
+                collections.filter((collection) =>
+                    collection.title.toLowerCase().includes(searchLower)
+                )
+            );
+        }
+    }, [searchTerm, collections]);
+
+    const sortCollections = () => {
+        const sortedCollections = [...filteredCollections];
+
+        sortedCollections.sort((a, b) => {
+            let comparison = 0;
+
+            // Ordena según el criterio seleccionado
+            switch (sortCriteria) {
+                case "title":
+                    comparison = a.title.localeCompare(b.title);
+                    break;
+                case "created":
+                    comparison = new Date(a.created_at) - new Date(b.created_at);
+                    break;
+                case "modified":
+                    comparison = new Date(a.updated_at) - new Date(b.updated_at);
+                    break;
+                default:
+                    break;
+            }
+
+            return sortAscending ? comparison : -comparison;
+        });
+        setFilteredCollections(sortedCollections);
+    };
+
+    useEffect(() => {
+        applyFilters();
+    }, [selectedFriends, selectedDate]);
+
+    useEffect(() => {
+        sortCollections();
+    }, [sortCriteria, sortAscending]);
+
     return (
         <>
             {isLoggedIn ? (
                 <Container fluid="xxl">
                     <FriendsSidebar />
+
+                    <Toolbar
+                        setSelectedFriends={setSelectedFriends}
+                        setSelectedDate={setSelectedDate}
+                        setSortCriteria={setSortCriteria}
+                        setSortAscending={setSortAscending}
+                        setSearchTerm={setSearchTerm}
+                        sortAscending={sortAscending}
+                        friends={friends}
+                        sortCriteria={sortCriteria}
+                        selectedDate={selectedDate}
+                        selectedFriends={selectedFriends}
+                        searchTerm={searchTerm}
+                    />
+
                     <Row>
-                        {collections.map((collection) => (
+                        {filteredCollections.map((collection) => (
                             <Col key={collection.id} style={{ maxWidth: "20rem" }} >
                                 <Card className="card-container custom-card"
                                     style={{
